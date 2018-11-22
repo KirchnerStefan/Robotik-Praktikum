@@ -51,7 +51,8 @@ namespace gazebo
 
       // Get the first joint. We are making an assumption about the model having at least one joint.
       std::cerr << "Total number of joints : " << _model->GetJointCount() << "\n";
-      for(int i=0; i<_model->GetJointCount(); i++){
+      for(int i=0; i<_model->GetJointCount(); i++)
+      {
 	this->SelectJoint(i);
       }
       this->SelectJoint(0);
