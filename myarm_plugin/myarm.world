@@ -1,0 +1,552 @@
+<?xml version="1.0" ?>
+<sdf version="1.6">
+  <world name="default">
+
+	<!-- A global light source -->
+	<include>
+	  <uri>model://sun</uri>
+	</include>
+
+	<!-- A ground plane -->
+	<include>
+	  <uri>model://ground_plane</uri>
+	</include>
+
+	<!-- Bei Gelegenheit Model in eigene Datei auslagern.
+		 Wenn moeglich, Links vermeiden. Objekte ueber <visual> eines Links
+		 vergroessern. (z.B. Finger = finger[Zylinder] + knuckle[Kugel])
+	-->	
+
+	  <model name='myownArm'>
+<!-- Definition der LINKS -->
+<!-- Oberarm -->
+		<link name='upperArm'>
+		  <pose frame=''>-0.571064 -0.3505 0.001465 0.006882 0 -0.224153</pose>
+		  <inertial>
+		    <mass>21.3619</mass>
+		    <inertia>
+		      <ixx>26.2398</ixx>
+		      <ixy>0</ixy>
+		      <ixz>0</ixz>
+		      <iyy>26.2398</iyy>
+		      <iyz>0</iyz>
+		      <izz>30.8731</izz>
+		    </inertia>
+		    <pose frame=''>0 0 0 0 -0 0</pose>
+		  </inertial>
+		  <self_collide>1</self_collide>
+		  <kinematic>0</kinematic>
+		  <visual name='visual'>
+		    <pose frame=''>0 0 0 0 -0 0</pose>
+		    <geometry>
+		      <cylinder>
+		        <radius>0.328476</radius>
+		        <length>1.17903</length>
+		      </cylinder>
+		    </geometry>
+		    <material>
+		      <lighting>1</lighting>
+		      <script>
+		        <uri>file://media/materials/scripts/gazebo.material</uri>
+		        <name>Gazebo/Grey</name>
+		      </script>
+		      <ambient>0.3 0.3 0.3 1</ambient>
+		      <diffuse>0.7 0.7 0.7 1</diffuse>
+		      <specular>0.01 0.01 0.01 1</specular>
+		      <emissive>0 0 0 1</emissive>
+		      <shader type='vertex'>
+		        <normal_map>__default__</normal_map>
+		      </shader>
+		    </material>
+		    <cast_shadows>1</cast_shadows>
+		    <transparency>0</transparency>
+		  </visual>
+		  <collision name='collision'>
+		    <laser_retro>0</laser_retro>
+		    <max_contacts>10</max_contacts>
+		    <pose frame=''>0 0 0 0 -0 0</pose>
+		    <geometry>
+		      <cylinder>
+		        <radius>0.328476</radius>
+		        <length>1.17903</length>
+		      </cylinder>
+		    </geometry>
+		  </collision>
+		</link>
+<!-- Ellenbogen -->
+		<link name='ellbow'>
+		  <pose frame=''>-0.585417 -0.360788 0.90538 -0 -0 -0</pose>
+		  <inertial>
+		    <mass>0.296121</mass>
+		    <inertia>
+		      <ixx>0.0131557</ixx>
+		      <ixy>0</ixy>
+		      <ixz>0</ixz>
+		      <iyy>0.0131557</iyy>
+		      <iyz>0</iyz>
+		      <izz>0.0131557</izz>
+		    </inertia>
+		    <pose frame=''>0 0 0 0 -0 0</pose>
+		  </inertial>
+		  <self_collide>0</self_collide>
+		  <kinematic>0</kinematic>
+		  <visual name='visual'>
+		    <pose frame=''>0 0 0 0 -0 0</pose>
+		    <geometry>
+		      <sphere>
+		        <radius>0.333266</radius>
+		      </sphere>
+		    </geometry>
+		    <material>
+		      <lighting>1</lighting>
+		      <script>
+		        <uri>file://media/materials/scripts/gazebo.material</uri>
+		        <name>Gazebo/Grey</name>
+		      </script>
+		      <ambient>0.3 0.3 0.3 1</ambient>
+		      <diffuse>0.7 0.7 0.7 1</diffuse>
+		      <specular>0.01 0.01 0.01 1</specular>
+		      <emissive>0 0 0 1</emissive>
+		      <shader type='vertex'>
+		        <normal_map>__default__</normal_map>
+		      </shader>
+		    </material>
+		    <cast_shadows>1</cast_shadows>
+		    <transparency>0</transparency>
+		  </visual>
+		  <collision name='collision'>
+		    <laser_retro>0</laser_retro>
+		    <max_contacts>10</max_contacts>
+		    <pose frame=''>0 0 0 0 -0 0</pose>
+		    <geometry>
+		      <sphere>
+		        <radius>0.333266</radius>
+		      </sphere>
+		    </geometry> 
+		  </collision>
+		</link>
+
+<!-- Unterarm -->
+		<link name='lowerArm'>
+		  <pose frame=''>-0.590082 -0.39635 1.26075 -1e-06 1e-06 -0.062089</pose>
+		  <inertial>
+		    <mass>0.0238196</mass>
+		    <inertia>
+		      <ixx>0.00052877</ixx>
+		      <ixy>0</ixy>
+		      <ixz>0</ixz>
+		      <iyy>0.00052877</iyy>
+		      <iyz>0</iyz>
+		      <izz>0.00014819</izz>
+		    </inertia>
+		    <pose frame=''>0 0 0 0 -0 0</pose>
+		  </inertial>
+		  <self_collide>1</self_collide>
+		  <kinematic>0</kinematic>
+		  <visual name='visual'>
+		    <pose frame=''>0 0 0 0 -0 0</pose>
+		    <geometry>
+		      <cylinder>
+		        <radius>0.111547</radius>
+		        <length>0.478603</length>
+		      </cylinder>
+		    </geometry>
+		    <material>
+		      <lighting>1</lighting>
+		      <script>
+		        <uri>file://media/materials/scripts/gazebo.material</uri>
+		        <name>Gazebo/Grey</name>
+		      </script>
+		      <ambient>0.3 0.3 0.3 1</ambient>
+		      <diffuse>0.7 0.7 0.7 1</diffuse>
+		      <specular>0.01 0.01 0.01 1</specular>
+		      <emissive>0 0 0 1</emissive>
+		      <shader type='vertex'>
+		        <normal_map>__default__</normal_map>
+		      </shader>
+		    </material>
+		    <cast_shadows>1</cast_shadows>
+		    <transparency>0</transparency>
+		  </visual>
+		  <collision name='collision'>
+		    <laser_retro>0</laser_retro>
+		    <max_contacts>10</max_contacts>
+		    <pose frame=''>0 0 0 0 -0 0</pose>
+		    <geometry>
+		      <cylinder>
+		        <radius>0.111547</radius>
+		        <length>0.478603</length>
+		      </cylinder>
+		    </geometry>
+		  </collision>
+		</link>
+<!-- Handgelenk --
+		<link name='wrist'>
+		  <pose frame=''>-0.594242 -0.394038 1.5126 -1e-06 1e-06 -0.062089</pose>
+		  <inertial>
+		    <mass>0.057306</mass>
+		    <inertia>
+		      <ixx>0.000851792</ixx>
+		      <ixy>0</ixy>
+		      <ixz>0</ixz>
+		      <iyy>0.000851792</iyy>
+		      <iyz>0</iyz>
+		      <izz>0.000851792</izz>
+		    </inertia>
+		    <pose frame=''>0 0 0 0 -0 0</pose>
+		  </inertial>
+		  <self_collide>0</self_collide>
+		  <kinematic>0</kinematic>
+		  <visual name='visual'>
+		    <pose frame=''>0 0 0 0 -0 0</pose>
+		    <geometry>
+		      <sphere>
+		        <radius>0.192771</radius>
+		      </sphere>
+		    </geometry>
+		    <material>
+		      <lighting>1</lighting>
+		      <script>
+		        <uri>file://media/materials/scripts/gazebo.material</uri>
+		        <name>Gazebo/Grey</name>
+		      </script>
+		      <ambient>0.3 0.3 0.3 1</ambient>
+		      <diffuse>0.7 0.7 0.7 1</diffuse>
+		      <specular>0.01 0.01 0.01 1</specular>
+		      <emissive>0 0 0 1</emissive>
+		    </material>
+		    <cast_shadows>1</cast_shadows>
+		    <transparency>0</transparency>
+		  </visual>
+		  <collision name='collision'>
+		    <laser_retro>0</laser_retro>
+		    <max_contacts>10</max_contacts>
+		    <pose frame=''>0 0 0 0 -0 0</pose>
+		    <geometry>
+		      <sphere>
+		        <radius>0.192771</radius>
+		      </sphere>
+		    </geometry>
+		  </collision>
+		</link>
+<!-- Handflaeche --
+		<link name='palm'>
+		  <pose frame=''>-0.597005 -0.413055 1.71918 -0 -0 -0</pose>
+		  <inertial>
+		    <mass>0.00367071</mass>
+		    <inertia>
+		      <ixx>2.409e-05</ixx>
+		      <ixy>0</ixy>
+		      <ixz>0</ixz>
+		      <iyy>2.409e-05</iyy>
+		      <iyz>0</iyz>
+		      <izz>6.45e-06</izz>
+		    </inertia>
+		    <pose frame=''>0 0 0 0 -0 0</pose>
+		  </inertial>
+		  <self_collide>1</self_collide>
+		  <kinematic>0</kinematic>
+		  <visual name='visual'>
+		    <pose frame=''>0 0 0 0 -0 0</pose>
+		    <geometry>
+		      <cylinder>
+		        <radius>0.059274</radius>
+		        <length>0.261167</length>
+		      </cylinder>
+		    </geometry>
+		    <material>
+		      <lighting>1</lighting>
+		      <script>
+		        <uri>file://media/materials/scripts/gazebo.material</uri>
+		        <name>Gazebo/Grey</name>
+		      </script>
+		      <ambient>0.3 0.3 0.3 1</ambient>
+		      <diffuse>0.7 0.7 0.7 1</diffuse>
+		      <specular>0.01 0.01 0.01 1</specular>
+		      <emissive>0 0 0 1</emissive>
+		      <shader type='vertex'>
+		        <normal_map>__default__</normal_map>
+		      </shader>
+		    </material>
+		    <cast_shadows>1</cast_shadows>
+		    <transparency>0</transparency>
+		  </visual>
+		  <collision name='collision'>
+		    <laser_retro>0</laser_retro>
+		    <max_contacts>10</max_contacts>
+		    <pose frame=''>0 0 0 0 -0 0</pose>
+		    <geometry>
+		      <cylinder>
+		        <radius>0.059274</radius>
+		        <length>0.261167</length>
+		      </cylinder>
+		    </geometry>
+		  </collision>
+		</link>
+<!-- Fingerknoechel --
+		<link name='knuckle'>
+		  <pose frame=''>-0.599325 -0.408976 1.85435 -0 -0 -0</pose>
+		  <inertial>
+		    <mass>0.00245853</mass>
+		    <inertia>
+		      <ixx>4.47843e-06</ixx>
+		      <ixy>0</ixy>
+		      <ixz>0</ixz>
+		      <iyy>4.47843e-06</iyy>
+		      <iyz>0</iyz>
+		      <izz>4.47843e-06</izz>
+		    </inertia>
+		    <pose frame=''>0 0 0 0 -0 0</pose>
+		  </inertial>
+		  <self_collide>0</self_collide>
+		  <kinematic>0</kinematic>
+		  <visual name='visual'>
+		    <pose frame=''>0 0 0 0 -0 0</pose>
+		    <geometry>
+		      <sphere>
+		        <radius>0.0674839</radius>
+		      </sphere>
+		    </geometry>
+		    <material>
+		      <lighting>1</lighting>
+		      <script>
+		        <uri>file://media/materials/scripts/gazebo.material</uri>
+		        <name>Gazebo/Grey</name>
+		      </script>
+		      <ambient>0.3 0.3 0.3 1</ambient>
+		      <diffuse>0.7 0.7 0.7 1</diffuse>
+		      <specular>0.01 0.01 0.01 1</specular>
+		      <emissive>0 0 0 1</emissive>
+		    </material>
+		    <cast_shadows>1</cast_shadows>
+		    <transparency>0</transparency>
+		  </visual>
+		  <collision name='collision'>
+		    <laser_retro>0</laser_retro>
+		    <max_contacts>10</max_contacts>
+		    <pose frame=''>0 0 0 0 -0 0</pose>
+		    <geometry>
+		      <sphere>
+		        <radius>0.067484</radius>
+		      </sphere>
+		    </geometry>
+		  </collision>
+		</link>
+<!-- Finger --
+		<link name='finger'>
+		  <pose frame=''>-0.599536 -0.431647 1.91072 0.497724 -0 0</pose>
+		  <inertial>
+		    <mass>0.000239192</mass>
+		    <inertia>
+		      <ixx>3.11562e-07</ixx>
+		      <ixy>0</ixy>
+		      <ixz>0</ixz>
+		      <iyy>3.11562e-07</iyy>
+		      <iyz>0</iyz>
+		      <izz>6.01825e-08</izz>
+		    </inertia>
+		    <pose frame=''>0 0 0 0 -0 0</pose>
+		  </inertial>
+		  <self_collide>0</self_collide>
+		  <kinematic>0</kinematic>
+		  <visual name='visual'>
+		    <pose frame=''>0 0 0 0 -0 0</pose>
+		    <geometry>
+		      <cylinder>
+		        <radius>0.0224387</radius>
+		        <length>0.118831</length>
+		      </cylinder>
+		    </geometry>
+		    <material>
+		      <lighting>1</lighting>
+		      <script>
+		        <uri>file://media/materials/scripts/gazebo.material</uri>
+		        <name>Gazebo/Grey</name>
+		      </script>
+		      <ambient>0.3 0.3 0.3 1</ambient>
+		      <diffuse>0.7 0.7 0.7 1</diffuse>
+		      <specular>0.01 0.01 0.01 1</specular>
+		      <emissive>0 0 0 1</emissive>
+		    </material>
+		    <cast_shadows>1</cast_shadows>
+		    <transparency>0</transparency>
+		  </visual>
+		  <collision name='collision'>
+		    <laser_retro>0</laser_retro>
+		    <max_contacts>10</max_contacts>
+		    <pose frame=''>0 0 0 0 -0 0</pose>
+		    <geometry>
+		      <cylinder>
+		        <radius>0.022439</radius>
+		        <length>0.118831</length>
+		      </cylinder>
+		    </geometry>
+		  </collision>
+		</link>			
+
+<!-- Definition der JOINTS -->
+<!-- Ellenbogen kann sich gegenueber Oberarm bewegen -->		
+		<joint name='upperArm_to_ellbow' type='revolute'>
+		  <parent>upperArm</parent>
+		  <child>ellbow</child>
+		  <pose frame=''>0 0 0 0 -0 0</pose>
+		  <axis>
+		    <xyz>-1 0 0</xyz>
+		    <use_parent_model_frame>0</use_parent_model_frame>
+		    <limit>
+		      <lower>-1.79769e+308</lower>
+		      <upper>1.79769e+308</upper>
+		      <effort>-1</effort>
+		      <velocity>-1</velocity>
+		    </limit>
+		    <dynamics>
+		      <spring_reference>0</spring_reference>
+		      <spring_stiffness>0</spring_stiffness>
+		      <damping>0.5</damping>
+		      <friction>1</friction>
+		    </dynamics>
+		  </axis>
+		  <physics>
+		    <ode>
+		      <limit>
+		        <cfm>0</cfm>
+		        <erp>0.2</erp>
+		      </limit>
+		      <suspension>
+		        <cfm>0</cfm>
+		        <erp>0.2</erp>
+		      </suspension>
+		    </ode>
+		  </physics>
+		</joint>
+<!-- Unterarm fest mit Ellenbogen Verbunden -->
+		<joint name='ellbow_to_lowerArm' type='fixed'>
+		  <parent>ellbow</parent>
+		  <child>lowerArm</child>
+		  <pose frame=''>0 0 0 0 -0 0</pose>
+		  <physics>
+		    <ode>
+		      <limit>
+		        <cfm>0</cfm>
+		        <erp>0.2</erp>
+		      </limit>
+		      <suspension>
+		        <cfm>0</cfm>
+		        <erp>0.2</erp>
+		      </suspension>
+		    </ode>
+		  </physics>
+		</joint>
+<!-- Handgelenk kann sich gegenueber Ellenbogen bewegen --
+		<joint name='lowerArm_to_wrist' type='revolute'>
+		  <parent>lowerArm</parent>
+		  <child>wrist</child>
+		  <pose frame=''>0 0 0 0 -0 0</pose>
+		  <axis>
+		    <xyz>-1 0 0</xyz>
+		    <use_parent_model_frame>0</use_parent_model_frame>
+		    <limit>
+		      <lower>-1.79769e+308</lower>
+		      <upper>1.79769e+308</upper>
+		      <effort>-1</effort>
+		      <velocity>-1</velocity>
+		    </limit>
+		    <dynamics>
+		      <spring_reference>0</spring_reference>
+		      <spring_stiffness>0</spring_stiffness>
+		      <damping>0</damping>
+		      <friction>0</friction>
+		    </dynamics>
+		  </axis>
+		  <physics>
+		    <ode>
+		      <limit>
+		        <cfm>0</cfm>
+		        <erp>0.2</erp>
+		      </limit>
+		      <suspension>
+		        <cfm>0</cfm>
+		        <erp>0.2</erp>
+		      </suspension>
+		    </ode>
+		  </physics>
+		</joint>
+<!-- Handflaeche an Handgelenk fixiert --
+		<joint name='wrist_to_palm' type='fixed'>
+		  <parent>wrist</parent>
+		  <child>palm</child>
+		  <pose frame=''>0 0 0 0 -0 0</pose>
+		  <physics>
+		    <ode>
+		      <limit>
+		        <cfm>0</cfm>
+		        <erp>0.2</erp>
+		      </limit>
+		      <suspension>
+		        <cfm>0</cfm>
+		        <erp>0.2</erp>
+		      </suspension>
+		    </ode>
+		  </physics>
+		</joint>
+<!-- Fingerknoechel kann sich gegenueber Handflaeche bewegen --
+		<joint name='palm_to_knuckle' type='revolute'>
+		  <parent>palm</parent>
+		  <child>knuckle</child>
+		  <pose frame=''>0 0 0 0 -0 0</pose>
+		  <axis>
+		    <xyz>-1 0 0</xyz>
+		    <use_parent_model_frame>0</use_parent_model_frame>
+		    <limit>
+		      <lower>-1.79769e+308</lower>
+		      <upper>1.79769e+308</upper>
+		      <effort>-1</effort>
+		      <velocity>-1</velocity>
+		    </limit>
+		    <dynamics>
+		      <spring_reference>0</spring_reference>
+		      <spring_stiffness>0</spring_stiffness>
+		      <damping>0</damping>
+		      <friction>0</friction>
+		    </dynamics>
+		  </axis>
+		  <physics>
+		    <ode>
+		      <limit>
+		        <cfm>0</cfm>
+		        <erp>0.2</erp>
+		      </limit>
+		      <suspension>
+		        <cfm>0</cfm>
+		        <erp>0.2</erp>
+		      </suspension>
+		    </ode>
+		  </physics>
+		</joint>
+<!-- Finger fest mit dem Fingerknoechel verbunden  --
+		<joint name='knuckle_to_finger' type='fixed'>
+		  <parent>knuckle</parent>
+		  <child>finger</child>
+		  <pose frame=''>0 0 -0.05 0 -0 0</pose>
+		  <physics>
+		    <ode>
+		      <limit>
+		        <cfm>0</cfm>
+		        <erp>0.2</erp>
+		      </limit>
+		      <suspension>
+		        <cfm>0</cfm>
+		        <erp>0.2</erp>
+		      </suspension>
+		    </ode>
+		  </physics>
+		</joint>
+-->
+
+		<static>0</static>
+		<allow_auto_disable>1</allow_auto_disable>
+<!-- Das ROS-Plugin einbinden -->
+		<plugin name='arm_control' filename='libmyarm_plugin.so'/>
+	  </model>
+  </world>
+</sdf>
