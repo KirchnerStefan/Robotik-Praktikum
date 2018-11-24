@@ -180,7 +180,7 @@
 		    </geometry>
 		  </collision>
 		</link>
-<!-- Handgelenk --
+<!-- Handgelenk -->
 		<link name='wrist'>
 		  <pose frame=''>-0.594242 -0.394038 1.5126 -1e-06 1e-06 -0.062089</pose>
 		  <inertial>
@@ -229,7 +229,7 @@
 		    </geometry>
 		  </collision>
 		</link>
-<!-- Handflaeche --
+<!-- Handflaeche -->
 		<link name='palm'>
 		  <pose frame=''>-0.597005 -0.413055 1.71918 -0 -0 -0</pose>
 		  <inertial>
@@ -437,7 +437,7 @@
 		    </ode>
 		  </physics>
 		</joint>
-<!-- Handgelenk kann sich gegenueber Ellenbogen bewegen --
+<!-- Handgelenk kann sich gegenueber Ellenbogen bewegen -->
 		<joint name='lowerArm_to_wrist' type='revolute'>
 		  <parent>lowerArm</parent>
 		  <child>wrist</child>
@@ -471,7 +471,7 @@
 		    </ode>
 		  </physics>
 		</joint>
-<!-- Handflaeche an Handgelenk fixiert --
+<!-- Handflaeche an Handgelenk fixiert -->
 		<joint name='wrist_to_palm' type='fixed'>
 		  <parent>wrist</parent>
 		  <child>palm</child>
