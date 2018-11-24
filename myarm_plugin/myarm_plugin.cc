@@ -15,35 +15,15 @@ namespace gazebo
     /// Constructor
     public: MyarmPlugin() {}
 
-    //  A node use for ROS transport
-    private: std::unique_ptr<ros::NodeHandle> rosNode;
-
-    //  A ROS subscriber for SETTING JOINTS POSITION
-    private: ros::Subscriber rosSub;
-    //  A ROS callbackqueue that helps process messages
-    private: ros::CallbackQueue rosQueue;
-    //  A thread the keeps running the rosQueue
-    private: std::thread rosQueueThread;
-
-    //  A ROS subscriber for SELECTING JOINT
-    private: ros::Subscriber rosSub2;
-    //  A ROS callbackqueue that helps process messages
-    private: ros::CallbackQueue rosQueue2;
-    //  A thread the keeps running the rosQueue
-    private: std::thread rosQueueThread2;
-
-
     /// The load function is called by Gazebo when the plugin is inserted into simulation
-    /// \param[in] _model A pointer to the model that this plugin is attached to.
-    /// \param[in] _sdf A pointer to the plugin's SDF element.
     public: virtual void Load(physics::ModelPtr _model, sdf::ElementPtr _sdf)
     {
-      std::cerr << "Plugin is Loaded\n";
+      printf("Plugin is Loaded\n");
       // Store the model pointer for convenience.
       this->model = _model;
 
       // Safety check, model must have at least one joint.
-      if (_model->GetJointCount() == 0)
+      if(_model->GetJointCount() == 0)
       {
         std::cerr << "Invalid joint count, no joints available.\n";
         return;
@@ -51,20 +31,10 @@ namespace gazebo
 
       // Get the first joint. We are making an assumption about the model having at least one joint.
       std::cerr << "Total number of joints : " << _model->GetJointCount() << "\n";
-      for(int i=0; i<_model->GetJointCount(); i++)
-      {
-	this->SelectJoint(i);
-      }
       this->SelectJoint(0);
        
       // Setup a PID-controller.
       this->pid = common::PID(0.1, 0, 0);
-
-      // Apply PID-controller for velocity
-      this->model->GetJointController()->SetVelocityPID(this->joint->GetScopedName(), this->pid);
-      // Default to zero velocity
-      double velocity = 0;
-      this->SetVelocity(velocity);
 
       // Apply PID-Controller for position
       this->model->GetJointController()->SetPositionPID(this->joint->GetScopedName(), this->pid);
@@ -103,18 +73,6 @@ namespace gazebo
        // Spin up the queue helper thread.
        this->rosQueueThread2 = std::thread(std::bind(&MyarmPlugin::QueueThread2, this));
 
-    }
-
-    //  Set the velocity of the joint via PID
-    public: void SetVelocity(const double &_vel)
-    {
-      this->model->GetJointController()->SetVelocityTarget(
-            this->joint->GetScopedName(), _vel);
-    }
-    //  Handle an incoming message from ROS for setting the velocity
-    public: void OnRosMsg_setVelocity(const std_msgs::Float32ConstPtr &_msg)
-    {
-    	this->SetVelocity(_msg->data);
     }
 
     // Set the position of the joint via PID
@@ -173,6 +131,23 @@ namespace gazebo
 
     ///  A PID controller for the joint.
     private: common::PID pid;
+
+    //  A node use for ROS transport
+    private: std::unique_ptr<ros::NodeHandle> rosNode;
+
+    //  A ROS subscriber for SETTING JOINTS POSITION
+    private: ros::Subscriber rosSub;
+    //  A ROS callbackqueue that helps process messages
+    private: ros::CallbackQueue rosQueue;
+    //  A thread the keeps running the rosQueue
+    private: std::thread rosQueueThread;
+
+    //  A ROS subscriber for SELECTING JOINT
+    private: ros::Subscriber rosSub2;
+    //  A ROS callbackqueue that helps process messages
+    private: ros::CallbackQueue rosQueue2;
+    //  A thread the keeps running the rosQueue
+    private: std::thread rosQueueThread2;
 
   };
 
