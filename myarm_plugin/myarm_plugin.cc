@@ -3,6 +3,8 @@
 #include <boost/bind.hpp>
 #include <gazebo/common/common.hh>
 #include <thread>
+#include <memory>
+#include <map>
 
 #include "ros/ros.h"
 #include "ros/callback_queue.h"
@@ -33,12 +35,14 @@ namespace gazebo
 
       // Get the first joint. We are making an assumption about the model having at least one joint.
       std::cerr << "Total number of joints : " << _model->GetJointCount() << "\n";
-      this->joint = this->model->GetJoints()[0];
 
-      std::cerr << "Selected Joint: " << this->joint->GetScopedName() << "\n";
+      //this->updateConnection = event::Events::ConnectWorldUpdateBegin(boost::bind(&MyarmPlugin::OnUpdate, this));
+      this->updateConnection = event::Events::ConnectWorldUpdateBegin(boost::bind(&MyarmPlugin::OnUpdate, this));
+      //store all Joints for later use
+      physics::Joint_V jointVector = this->model->GetJoints();
        
       // Setup a PID-controller.
-      this->pid = common::PID(10,0.1,0.01,10,-10);
+      this->pid = common::PID(5,0.1,0.01,10,-10);
 
       // Initialize ros, if it has not already bee initialized.
       if (!ros::isInitialized())
@@ -47,23 +51,37 @@ namespace gazebo
 	 char **argv = NULL;
 	 ros::init(argc, argv, "gazebo_client", ros::init_options::NoSigintHandler);
       }
-      // Create ROS node.
       this->rosNode.reset(new ros::NodeHandle("gazebo_client"));
 
-      // Create topic for SETTING POSITION
-      ros::SubscribeOptions so =
-	    ros::SubscribeOptions::create<std_msgs::Float32>(
-	      "/" + this->model->GetName() + "/setPosition",1,
-	      boost::bind(&MyarmPlugin::ROSCallback, this, _1),
-	      ros::VoidPtr(), &this->rosQueue);
-      this->rosSub = this->rosNode->subscribe(so);
+      for(physics::Joint_V::iterator jit=jointVector.begin(); jit!=jointVector.end(); ++jit)
+      {
+         // if revolute joint. if not, ignore joint
+         if((*jit)->GetType() != 576)
+	 	continue;    
+	    std::string subPath = "/" + (*jit)->GetName() + "/setPosition";
+	    // Create topics for SETTING POSITION
+	    ros::SubscribeOptions so = 
+		ros::SubscribeOptions::create<std_msgs::Float32>(
+		      subPath,1,boost::bind(&MyarmPlugin::ROSCallback, this, _1, (*jit)->GetName()),
+		      ros::VoidPtr(), &this->rosQueue);
+	    // add subscriber to list
+            this->rosSubList.push_back(this->rosNode->subscribe(so));
+	    std::cerr << "Topic name: " << subPath << "\n";
+            joints.push_back((*jit)->GetName());
+
+	    // save the Position of joint in a map
+	    #if GAZEBO_MAJOR_VERSION < 9
+            jointAngles[(*jit)->GetName()] = (*jit)->GetAngle(0).Radian();
+	    #else
+	    jointAngles[(*jit)->GetName()] = (*jit)->Position(0);
+	    #endif
+	 
+      }
       // Spin up the queue helper thread.
       this->rosQueueThread = std::thread(std::bind(&MyarmPlugin::QueueThread, this));
-
-      this->updateConnection = event::Events::ConnectWorldUpdateBegin(boost::bind(&MyarmPlugin::OnUpdate, this));
     }
 
-    //  ROS helper function that processes messages for SETTING POSITION
+    //  ROS helper function that processes messages
     private: void QueueThread()
     {
        static const double timeout = 0.01;
@@ -72,15 +90,18 @@ namespace gazebo
           this->rosQueue.callAvailable(ros::WallDuration(timeout));
        }
     }
-
-	void ROSCallback(const std_msgs::Float32ConstPtr &_msg)
-	{
-		 // you update the position of where you want the joint to move
-		 this->joint_target_pos = _msg->data;
-		 std::cerr << "entered Callback. Target pos is:"<< this->joint_target_pos << "\n";
-	}
-	void OnUpdate()
-	{
+    // take value from message and write it to map
+    private: void ROSCallback(const std_msgs::Float32ConstPtr &_msg, std::string jointName)
+    {
+	// you update the position of where you want the joint to move
+	this->jointAngles[jointName] = _msg->data;
+        return;
+    }
+    // Gets called, everytime the world is updated
+    private: void OnUpdate()
+    {
+	for(auto it=this->joints.begin(); it!=joints.end(); ++it)
+        {
 		// compute the steptime for the PID
 		#if GAZEBO_MAJOR_VERSION < 9
 		common::Time currTime = this->model->GetWorld()->GetSimTime();
@@ -88,15 +109,15 @@ namespace gazebo
 		common::Time currTime = this->model->GetWorld()->SimTime();
 		#endif
 		common::Time stepTime = currTime - this->prevUpdateTime;
-	 	this->prevUpdateTime = currTime;
+		this->prevUpdateTime = currTime;
 
-	    // set the current position of the joint, and the target position, 
+		// set the current position of the joint, the target position 
 		// and the maximum effort limit
-		double pos_target = this->joint_target_pos;
+		double pos_target = this->jointAngles[(*it)];
 		#if GAZEBO_MAJOR_VERSION < 9
-		double pos_curr = this->joint->GetAngle(0).Radian();
+		double pos_curr = this->(*it)->GetAngle(0).Radian();
 		#else
-		double pos_curr = this->joint->Position(0);
+		double pos_curr = this->(*it)->Position(0);
 		#endif
 		double max_cmd = this->joint_max_effort;
 
@@ -108,11 +129,13 @@ namespace gazebo
 
 		// check if the effort is larger than the maximum permitted one
 		effort_cmd = effort_cmd > max_cmd ? max_cmd :
-		            (effort_cmd < -max_cmd ? -max_cmd : effort_cmd);
+			    (effort_cmd < -max_cmd ? -max_cmd : effort_cmd);
 
 		// apply the force on the joint
-		this->joint->SetForce(0, effort_cmd);
+		this->(*it)->SetForce(0, effort_cmd);
 	}
+        return;
+    }
 
     ///  Pointer to the model.
     private: physics::ModelPtr model;
@@ -120,11 +143,18 @@ namespace gazebo
     private: physics::JointPtr joint;
     ///  A PID controller for the joint.
     private: common::PID pid;
-	//
-	private: event::ConnectionPtr updateConnection;
-	private: common::Time prevUpdateTime;
-	private: double joint_target_pos;
-	private: float joint_max_effort =10;
+    // Pointer for UpdateEvent in Gazebo
+    private: event::ConnectionPtr updateConnection;
+    private: common::Time prevUpdateTime;
+    
+    private: double joint_target_pos; //replaced with map
+    private: float joint_max_effort = 10;
+    //List with all subscribers
+    private: std::list<ros::Subscriber> rosSubList;
+    //List with all revolute joint names
+    private: std::list<std::string> joints;
+    //map with joints' angles by their names
+    private: std::map<std::string, double> jointAngles;
 
     //  A node use for ROS transport
     private: std::unique_ptr<ros::NodeHandle> rosNode;
