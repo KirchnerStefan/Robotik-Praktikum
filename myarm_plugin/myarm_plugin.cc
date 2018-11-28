@@ -35,7 +35,7 @@ namespace gazebo
       std::cerr << "Total number of joints : " << _model->GetJointCount() << "\n";
       this->joint = this->model->GetJoints()[0];
 
-	  std::cerr << "Selected Joint: " << this->joint->GetScopedName() << "\n";
+      std::cerr << "Selected Joint: " << this->joint->GetScopedName() << "\n";
        
       // Setup a PID-controller.
       this->pid = common::PID(10,0.1,0.01,10,-10);
@@ -44,38 +44,23 @@ namespace gazebo
       if (!ros::isInitialized())
       {
          int argc = 0;
-		 char **argv = NULL;
-		 ros::init(argc, argv, "gazebo_client", ros::init_options::NoSigintHandler);
+	 char **argv = NULL;
+	 ros::init(argc, argv, "gazebo_client", ros::init_options::NoSigintHandler);
       }
       // Create ROS node.
       this->rosNode.reset(new ros::NodeHandle("gazebo_client"));
 
       // Create topic for SETTING POSITION
-      //ros::SubscribeOptions so =
-	    //ros::SubscribeOptions::create<std_msgs::Float32>(
-	      //"/" + this->model->GetName() + "/setPosition",1,
-	      //boost::bind(&MyarmPlugin::OnRosMsg_setPosition, this, _1),
-	      //ros::VoidPtr(), &this->rosQueue);
-      //this->rosSub = this->rosNode->subscribe(so);
+      ros::SubscribeOptions so =
+	    ros::SubscribeOptions::create<std_msgs::Float32>(
+	      "/" + this->model->GetName() + "/setPosition",1,
+	      boost::bind(&MyarmPlugin::ROSCallback, this, _1),
+	      ros::VoidPtr(), &this->rosQueue);
+      this->rosSub = this->rosNode->subscribe(so);
       // Spin up the queue helper thread.
-      //this->rosQueueThread = std::thread(std::bind(&MyarmPlugin::QueueThread, this));
+      this->rosQueueThread = std::thread(std::bind(&MyarmPlugin::QueueThread, this));
 
-	  // subscribing to the rost topic, and calling the callback function
-      this->rosSub = this->rosNode->subscribe("/ROS_topic", 10, &MyarmPlugin::ROSCallback, this);
-	  // Listen to the update event. This event is broadcast every simulation iteration.
       this->updateConnection = event::Events::ConnectWorldUpdateBegin(boost::bind(&MyarmPlugin::OnUpdate, this));
-    }
-
-    // Set the position of the joint via PID
-    public: void SetPosition(const double &_pos)
-    {
-       this->model->GetJointController()->SetPositionTarget(
-	    this->joint->GetScopedName(), _pos);
-    }
-    //  Handle an incoming message from ROS for setting the position
-    public: void OnRosMsg_setPosition(const std_msgs::Float32ConstPtr &_msg)
-    {
-       this->SetPosition(_msg->data);
     }
 
     //  ROS helper function that processes messages for SETTING POSITION
@@ -97,14 +82,22 @@ namespace gazebo
 	void OnUpdate()
 	{
 		// compute the steptime for the PID
+		#if GAZEBO_MAJOR_VERSION < 9
 		common::Time currTime = this->model->GetWorld()->GetSimTime();
+		#else
+		common::Time currTime = this->model->GetWorld()->SimTime();
+		#endif
 		common::Time stepTime = currTime - this->prevUpdateTime;
 	 	this->prevUpdateTime = currTime;
 
 	    // set the current position of the joint, and the target position, 
 		// and the maximum effort limit
 		double pos_target = this->joint_target_pos;
+		#if GAZEBO_MAJOR_VERSION < 9
 		double pos_curr = this->joint->GetAngle(0).Radian();
+		#else
+		double pos_curr = this->joint->Position(0);
+		#endif
 		double max_cmd = this->joint_max_effort;
 
 		// calculate the error between the current position and the target one
