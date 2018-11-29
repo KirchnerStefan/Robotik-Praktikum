@@ -48,8 +48,8 @@ namespace gazebo
       if (!ros::isInitialized())
       {
          int argc = 0;
-	 char **argv = NULL;
-	 ros::init(argc, argv, "gazebo_client", ros::init_options::NoSigintHandler);
+	 	 char **argv = NULL;
+	 	 ros::init(argc, argv, "gazebo_client", ros::init_options::NoSigintHandler);
       }
       this->rosNode.reset(new ros::NodeHandle("gazebo_client"));
 
@@ -71,7 +71,7 @@ namespace gazebo
 
 	    // save the Position of joint in a map
 	    #if GAZEBO_MAJOR_VERSION < 9
-            jointAngles[(*jit)->GetName()] = (*jit)->GetAngle(0).Radian();
+        jointAngles[(*jit)->GetName()] = (*jit)->GetAngle(0).Radian();
 	    #else
 	    jointAngles[(*jit)->GetName()] = (*jit)->Position(0);
 	    #endif
@@ -100,24 +100,24 @@ namespace gazebo
     // Gets called, everytime the world is updated
     private: void OnUpdate()
     {
-	for(auto it=this->joints.begin(); it!=joints.end(); ++it)
-        {
-		// compute the steptime for the PID
-		#if GAZEBO_MAJOR_VERSION < 9
-		common::Time currTime = this->model->GetWorld()->GetSimTime();
-		#else
-		common::Time currTime = this->model->GetWorld()->SimTime();
-		#endif
-		common::Time stepTime = currTime - this->prevUpdateTime;
-		this->prevUpdateTime = currTime;
+	  // compute the steptime for the PID
+	  #if GAZEBO_MAJOR_VERSION < 9
+	  common::Time currTime = this->model->GetWorld()->GetSimTime();
+	  #else
+	  common::Time currTime = this->model->GetWorld()->SimTime();
+	  #endif
+	  common::Time stepTime = currTime - this->prevUpdateTime;
+	  this->prevUpdateTime = currTime;
 
+	  for(auto it=this->joints.begin(); it!=joints.end(); ++it)
+      {		
 		// set the current position of the joint, the target position 
 		// and the maximum effort limit
 		double pos_target = this->jointAngles[(*it)];
 		#if GAZEBO_MAJOR_VERSION < 9
-		double pos_curr = this->(*it)->GetAngle(0).Radian();
+		double pos_curr = this->model->GetJoint(*it)->GetAngle(0).Radian();
 		#else
-		double pos_curr = this->(*it)->Position(0);
+		double pos_curr = this->model->GetJoint(*it)->Position(0);
 		#endif
 		double max_cmd = this->joint_max_effort;
 
@@ -132,8 +132,8 @@ namespace gazebo
 			    (effort_cmd < -max_cmd ? -max_cmd : effort_cmd);
 
 		// apply the force on the joint
-		this->(*it)->SetForce(0, effort_cmd);
-	}
+		this->model->GetJoint(*it)->SetForce(0, effort_cmd);
+	  }
         return;
     }
 

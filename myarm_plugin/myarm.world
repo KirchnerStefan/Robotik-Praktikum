@@ -283,7 +283,7 @@
 		    </geometry>
 		  </collision>
 		</link>
-<!-- Fingerknoechel --
+<!-- Fingerknoechel -->
 		<link name='knuckle'>
 		  <pose frame=''>-0.599325 -0.408976 1.85435 -0 -0 -0</pose>
 		  <inertial>
@@ -332,7 +332,7 @@
 		    </geometry>
 		  </collision>
 		</link>
-<!-- Finger --
+<!-- Finger -->
 		<link name='finger'>
 		  <pose frame=''>-0.599536 -0.431647 1.91072 0.497724 -0 0</pose>
 		  <inertial>
@@ -489,7 +489,7 @@
 		    </ode>
 		  </physics>
 		</joint>
-<!-- Fingerknoechel kann sich gegenueber Handflaeche bewegen --
+<!-- Fingerknoechel kann sich gegenueber Handflaeche bewegen -->
 		<joint name='palm_to_knuckle' type='revolute'>
 		  <parent>palm</parent>
 		  <child>knuckle</child>
@@ -523,11 +523,11 @@
 		    </ode>
 		  </physics>
 		</joint>
-<!-- Finger fest mit dem Fingerknoechel verbunden  --
+<!-- Finger fest mit dem Fingerknoechel verbunden  -->
 		<joint name='knuckle_to_finger' type='fixed'>
 		  <parent>knuckle</parent>
 		  <child>finger</child>
-		  <pose frame=''>0 0 -0.05 0 -0 0</pose>
+		  <pose frame=''>0 0 0 0 -0 0</pose>
 		  <physics>
 		    <ode>
 		      <limit>
@@ -541,7 +541,6 @@
 		    </ode>
 		  </physics>
 		</joint>
--->
 
 		<static>0</static>
 		<allow_auto_disable>1</allow_auto_disable>
