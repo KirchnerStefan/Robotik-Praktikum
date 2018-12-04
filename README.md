@@ -8,8 +8,8 @@
 -	cmake ../ 
 -	make 
 -	export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:<your path to>/myarm_plugin/build
-It's important to export the path and start gazebo from build-folder. 
-It will possibly not recognize the shared library for the plugin otherwise.
+  It is important to export the path and start gazebo from build-folder. 
+  Otherwise gazebo will possibly not recognize the shared library for the plugin.
 3. in new terminal:  
 -	roscore &
 -	gazebo --verbose ../myarm.world &
