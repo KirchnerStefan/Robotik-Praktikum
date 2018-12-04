@@ -5,7 +5,7 @@
 #include <thread>
 #include <memory>
 #include <map>
-
+#include <cmath>
 #include "ros/ros.h"
 #include "ros/callback_queue.h"
 #include "ros/subscribe_options.h"
@@ -93,8 +93,14 @@ namespace gazebo
     // take value from message and write it to map
     private: void ROSCallback(const std_msgs::Float32ConstPtr &_msg, std::string jointName)
     {
+	float angle = _msg->data;
+	if(angle < -90)
+	  angle = -90;
+	if(angle > 90)
+	  angle = 90;
+	float newAngle = (angle*M_PI)/180;
 	// you update the position of where you want the joint to move
-	this->jointAngles[jointName] = _msg->data;
+	this->jointAngles[jointName] = newAngle;
         return;
     }
     // Gets called, everytime the world is updated
