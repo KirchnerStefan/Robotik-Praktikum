@@ -1,7 +1,11 @@
 #include <gazebo/gazebo.hh>
 #include <gazebo/physics/physics.hh>
+#include <boost/bind.hpp>
+#include <gazebo/common/common.hh>
 #include <thread>
-
+#include <memory>
+#include <map>
+#include <cmath>
 #include "ros/ros.h"
 #include "ros/callback_queue.h"
 #include "ros/subscribe_options.h"
@@ -31,80 +35,53 @@ namespace gazebo
 
       // Get the first joint. We are making an assumption about the model having at least one joint.
       std::cerr << "Total number of joints : " << _model->GetJointCount() << "\n";
-      this->SelectJoint(0);
+
+      //this->updateConnection = event::Events::ConnectWorldUpdateBegin(boost::bind(&MyarmPlugin::OnUpdate, this));
+      this->updateConnection = event::Events::ConnectWorldUpdateBegin(boost::bind(&MyarmPlugin::OnUpdate, this));
+      //store all Joints for later use
+      physics::Joint_V jointVector = this->model->GetJoints();
        
       // Setup a PID-controller.
-      this->pid = common::PID(0.1, 0, 0);
-
-      // Apply PID-Controller for position
-      this->model->GetJointController()->SetPositionPID(this->joint->GetScopedName(), this->pid);
-      // Default to position zero
-      double angle = 0;    
-      this->SetPosition(angle);
+      this->pid = common::PID(5,0.1,0.01,10,-10);
 
       // Initialize ros, if it has not already bee initialized.
       if (!ros::isInitialized())
       {
          int argc = 0;
-	 char **argv = NULL;
-	 ros::init(argc, argv, "gazebo_client", ros::init_options::NoSigintHandler);
+	 	 char **argv = NULL;
+	 	 ros::init(argc, argv, "gazebo_client", ros::init_options::NoSigintHandler);
       }
-
-      // Create ROS node.
       this->rosNode.reset(new ros::NodeHandle("gazebo_client"));
 
-      // Create topic for SETTING POSITION
-      ros::SubscribeOptions so =
-	    ros::SubscribeOptions::create<std_msgs::Float32>(
-	      "/" + this->model->GetName() + "/setPosition",1,
-	      boost::bind(&MyarmPlugin::OnRosMsg_setPosition, this, _1),
-	      ros::VoidPtr(), &this->rosQueue);
-      this->rosSub = this->rosNode->subscribe(so);
+      for(physics::Joint_V::iterator jit=jointVector.begin(); jit!=jointVector.end(); ++jit)
+      {
+         // if revolute joint. if not, ignore joint
+         if((*jit)->GetType() != 576)
+	 	continue;    
+	    std::string subPath = "/" + (*jit)->GetName() + "/setPosition";
+	    // Create topics for SETTING POSITION
+	    ros::SubscribeOptions so = 
+		ros::SubscribeOptions::create<std_msgs::Float32>(
+		      subPath,1,boost::bind(&MyarmPlugin::ROSCallback, this, _1, (*jit)->GetName()),
+		      ros::VoidPtr(), &this->rosQueue);
+	    // add subscriber to list
+            this->rosSubList.push_back(this->rosNode->subscribe(so));
+	    std::cerr << "Topic name: " << subPath << "\n";
+            joints.push_back((*jit)->GetName());
+
+	    // save the Position of joint in a map
+	    #if GAZEBO_MAJOR_VERSION < 9
+        jointAngles[(*jit)->GetName()] = (*jit)->GetAngle(0).Radian();
+	    #else
+	    jointAngles[(*jit)->GetName()] = (*jit)->Position(0);
+	    #endif
+	 
+      }
       // Spin up the queue helper thread.
       this->rosQueueThread = std::thread(std::bind(&MyarmPlugin::QueueThread, this));
-
-      // Create topic for SELECTING JOINT
-      ros::SubscribeOptions so2 =
-	    ros::SubscribeOptions::create<std_msgs::Float32>(
-	      "/" + this->model->GetName() + "/selectJoint",1,
-	      boost::bind(&MyarmPlugin::OnRosMsg_selectJoint, this, _1),
-	      ros::VoidPtr(), &this->rosQueue2);
-       this->rosSub2 = this->rosNode->subscribe(so2);
-       // Spin up the queue helper thread.
-       this->rosQueueThread2 = std::thread(std::bind(&MyarmPlugin::QueueThread2, this));
-
     }
 
-    // Set the position of the joint via PID
-    public: void SetPosition(const double &_pos)
-    {
-       this->model->GetJointController()->SetPositionTarget(
-	    this->joint->GetScopedName(), _pos);
-    }
-    //  Handle an incoming message from ROS for setting the position
-    public: void OnRosMsg_setPosition(const std_msgs::Float32ConstPtr &_msg)
-    {
-       this->SetPosition(_msg->data);
-    }
-
-
-    // Select Joint that will be altered
-    public: void SelectJoint(const int &_jointNumber)
-    {      
-       this->joint = model->GetJoints()[_jointNumber];
-       // Give name of selected Joint
-       std::cerr << "Selected joints name is: " << joint->GetScopedName() <<"\n";
-    }
-
-// NUR EINE MESSAGE SENDEN, SONST TOPIC VERSTOPFT!!!
-
-    //  Handle an incoming message from ROS for selecting the joint
-    public: void OnRosMsg_selectJoint(const std_msgs::Float32ConstPtr &_msg)
-    {
-       this->SelectJoint(_msg->data);
-    }
-
-    //  ROS helper function that processes messages for SETTING POSITION
+    //  ROS helper function that processes messages
     private: void QueueThread()
     {
        static const double timeout = 0.01;
@@ -113,41 +90,86 @@ namespace gazebo
           this->rosQueue.callAvailable(ros::WallDuration(timeout));
        }
     }
-    //  ROS helper function that processes messages for SELECTING JOINT
-    private: void QueueThread2()
+    // take value from message and write it to map
+    private: void ROSCallback(const std_msgs::Float32ConstPtr &_msg, std::string jointName)
     {
-       static const double timeout = 0.01;
-       while (this->rosNode->ok())
-       {
-          this->rosQueue2.callAvailable(ros::WallDuration(timeout));
-       }
+	float angle = _msg->data;
+	if(angle < -90)
+	  angle = -90;
+	if(angle > 90)
+	  angle = 90;
+	float newAngle = (angle*M_PI)/180;
+	// you update the position of where you want the joint to move
+	this->jointAngles[jointName] = newAngle;
+        return;
+    }
+    // Gets called, everytime the world is updated
+    private: void OnUpdate()
+    {
+	  // compute the steptime for the PID
+	  #if GAZEBO_MAJOR_VERSION < 9
+	  common::Time currTime = this->model->GetWorld()->GetSimTime();
+	  #else
+	  common::Time currTime = this->model->GetWorld()->SimTime();
+	  #endif
+	  common::Time stepTime = currTime - this->prevUpdateTime;
+	  this->prevUpdateTime = currTime;
+
+	  for(auto it=this->joints.begin(); it!=joints.end(); ++it)
+      {		
+		// set the current position of the joint, the target position 
+		// and the maximum effort limit
+		double pos_target = this->jointAngles[(*it)];
+		#if GAZEBO_MAJOR_VERSION < 9
+		double pos_curr = this->model->GetJoint(*it)->GetAngle(0).Radian();
+		#else
+		double pos_curr = this->model->GetJoint(*it)->Position(0);
+		#endif
+		double max_cmd = this->joint_max_effort;
+
+		// calculate the error between the current position and the target one
+		double pos_err = pos_curr - pos_target;
+
+		// compute the effort via the PID, which you will apply on the joint
+		double effort_cmd = this->pid.Update(pos_err, stepTime);
+
+		// check if the effort is larger than the maximum permitted one
+		effort_cmd = effort_cmd > max_cmd ? max_cmd :
+			    (effort_cmd < -max_cmd ? -max_cmd : effort_cmd);
+
+		// apply the force on the joint
+		this->model->GetJoint(*it)->SetForce(0, effort_cmd);
+	  }
+        return;
     }
 
     ///  Pointer to the model.
     private: physics::ModelPtr model;
-
     ///  Pointer to the joint.
     private: physics::JointPtr joint;
-
     ///  A PID controller for the joint.
     private: common::PID pid;
+    // Pointer for UpdateEvent in Gazebo
+    private: event::ConnectionPtr updateConnection;
+    private: common::Time prevUpdateTime;
+    
+    private: double joint_target_pos; //replaced with map
+    private: float joint_max_effort = 10;
+    //List with all subscribers
+    private: std::list<ros::Subscriber> rosSubList;
+    //List with all revolute joint names
+    private: std::list<std::string> joints;
+    //map with joints' angles by their names
+    private: std::map<std::string, double> jointAngles;
 
     //  A node use for ROS transport
     private: std::unique_ptr<ros::NodeHandle> rosNode;
-
     //  A ROS subscriber for SETTING JOINTS POSITION
     private: ros::Subscriber rosSub;
     //  A ROS callbackqueue that helps process messages
     private: ros::CallbackQueue rosQueue;
     //  A thread the keeps running the rosQueue
     private: std::thread rosQueueThread;
-
-    //  A ROS subscriber for SELECTING JOINT
-    private: ros::Subscriber rosSub2;
-    //  A ROS callbackqueue that helps process messages
-    private: ros::CallbackQueue rosQueue2;
-    //  A thread the keeps running the rosQueue
-    private: std::thread rosQueueThread2;
 
   };
 
