@@ -42,7 +42,7 @@ namespace gazebo
       physics::Joint_V jointVector = this->model->GetJoints();
        
       // Setup a PID-controller.
-      this->pid = common::PID(5,0.1,0.01,10,-10);
+      this->pid = common::PID(5,0.1,0.1,5,-5);
 
       // Initialize ros, if it has not already bee initialized.
       if (!ros::isInitialized())
@@ -53,28 +53,29 @@ namespace gazebo
       }
       this->rosNode.reset(new ros::NodeHandle("gazebo_client"));
 
+	  //create Topics and Subscribe tos them
       for(physics::Joint_V::iterator jit=jointVector.begin(); jit!=jointVector.end(); ++jit)
       {
          // if revolute joint. if not, ignore joint
          if((*jit)->GetType() != 576)
-	 	continue;    
-	    std::string subPath = "/" + (*jit)->GetName() + "/setPosition";
-	    // Create topics for SETTING POSITION
-	    ros::SubscribeOptions so = 
-		ros::SubscribeOptions::create<std_msgs::Float32>(
+	 	 continue;    
+	     std::string subPath = "/" + (*jit)->GetName() + "/setPosition";
+	     // Create topics for SETTING POSITION
+	     ros::SubscribeOptions so = 
+		 ros::SubscribeOptions::create<std_msgs::Float32>(
 		      subPath,1,boost::bind(&MyarmPlugin::ROSCallback, this, _1, (*jit)->GetName()),
 		      ros::VoidPtr(), &this->rosQueue);
-	    // add subscriber to list
-            this->rosSubList.push_back(this->rosNode->subscribe(so));
-	    std::cerr << "Topic name: " << subPath << "\n";
-            joints.push_back((*jit)->GetName());
+	     // add subscriber to list
+         this->rosSubList.push_back(this->rosNode->subscribe(so));
+	     std::cerr << "Topic name: " << subPath << "\n";
+         joints.push_back((*jit)->GetName());
 
-	    // save the Position of joint in a map
-	    #if GAZEBO_MAJOR_VERSION < 9
-        jointAngles[(*jit)->GetName()] = (*jit)->GetAngle(0).Radian();
-	    #else
-	    jointAngles[(*jit)->GetName()] = (*jit)->Position(0);
-	    #endif
+	     // save the Position of joint in a map
+	     #if GAZEBO_MAJOR_VERSION < 9
+         jointAngles[(*jit)->GetName()] = (*jit)->GetAngle(0).Radian();
+	     #else
+	     jointAngles[(*jit)->GetName()] = (*jit)->Position(0);
+	     #endif
 	 
       }
       // Spin up the queue helper thread.

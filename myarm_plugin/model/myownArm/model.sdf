@@ -1,23 +1,6 @@
-<?xml version="1.0" ?>
-<sdf version="1.6">
-  <world name="default">
-
-	<!-- A global light source -->
-	<include>
-	  <uri>model://sun</uri>
-	</include>
-
-	<!-- A ground plane -->
-	<include>
-	  <uri>model://ground_plane</uri>
-	</include>
-
-	<!-- Bei Gelegenheit Model in eigene Datei auslagern.
-		 Wenn moeglich, Links vermeiden. Objekte ueber <visual> eines Links
-		 vergroessern. (z.B. Finger = finger[Zylinder] + knuckle[Kugel])
-	-->	
-
-<model name='myownArm'>
+<?xml version='1.0'?>
+<sdf version='1.6'>
+  <model name='myownArm'>
     <link name='Bodenplatte'>
       <pose frame=''>-0.110501 0 -0.267273 0 -0 0</pose>
       <inertial>
@@ -707,7 +690,7 @@
       <child>GrossesGelenk1</child>
       <pose frame=''>0 0 0 0 -0 0</pose>
       <axis>
-        <xyz>1 0 0</xyz>
+        <xyz>1 0 0.01</xyz>
         <use_parent_model_frame>0</use_parent_model_frame>
         <limit>
           <lower>-1.79769e+308</lower>
@@ -719,7 +702,7 @@
           <spring_reference>0</spring_reference>
           <spring_stiffness>0</spring_stiffness>
           <damping>0</damping>
-          <friction>1</friction>
+          <friction>0</friction>
         </dynamics>
       </axis>
       <physics>
@@ -769,7 +752,7 @@
           <spring_reference>0</spring_reference>
           <spring_stiffness>0</spring_stiffness>
           <damping>0</damping>
-          <friction>1</friction>
+          <friction>0</friction>
         </dynamics>
       </axis>
       <physics>
@@ -802,7 +785,7 @@
           <spring_reference>0</spring_reference>
           <spring_stiffness>0</spring_stiffness>
           <damping>0</damping>
-          <friction>1</friction>
+          <friction>0</friction>
         </dynamics>
       </axis>
       <physics>
@@ -835,7 +818,7 @@
           <spring_reference>0</spring_reference>
           <spring_stiffness>0</spring_stiffness>
           <damping>0</damping>
-          <friction>1</friction>
+          <friction>0</friction>
         </dynamics>
       </axis>
       <physics>
@@ -872,5 +855,4 @@
     <allow_auto_disable>1</allow_auto_disable>
     <plugin name='arm_control' filename='libmyarm_plugin.so'/>
   </model>
-  </world>
 </sdf>
