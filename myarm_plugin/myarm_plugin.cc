@@ -42,7 +42,10 @@ namespace gazebo
       physics::Joint_V jointVector = this->model->GetJoints();
        
       // Setup a PID-controller.
-      this->pid = common::PID(5,0.1,0.1,5,-5);
+      this->pid = common::PID(5,2,10,5,-5);
+      //this->pidSmall = common::PID(5,0.1,0.1,5,-5);
+      //this->pidMiddle = common::PID(40,2.5,10,5,-5);
+      //this->pidBig = common::PID(50,2,10,5,-5);
 
       // Initialize ros, if it has not already bee initialized.
       if (!ros::isInitialized())
@@ -59,24 +62,25 @@ namespace gazebo
          // if revolute joint. if not, ignore joint
          if((*jit)->GetType() != 576)
 	 	 continue;    
-	     std::string subPath = "/" + (*jit)->GetName() + "/setPosition";
-	     // Create topics for SETTING POSITION
-	     ros::SubscribeOptions so = 
+	 std::string subPath = "/" + (*jit)->GetName() + "/setPosition";
+	 // Create topics for SETTING POSITION
+	 ros::SubscribeOptions so = 
 		 ros::SubscribeOptions::create<std_msgs::Float32>(
 		      subPath,1,boost::bind(&MyarmPlugin::ROSCallback, this, _1, (*jit)->GetName()),
 		      ros::VoidPtr(), &this->rosQueue);
-	     // add subscriber to list
+	 // add subscriber to list
          this->rosSubList.push_back(this->rosNode->subscribe(so));
-	     std::cerr << "Topic name: " << subPath << "\n";
+	 std::cerr << "Topic name: " << subPath << "\n";
          joints.push_back((*jit)->GetName());
 
-	     // save the Position of joint in a map
-	     #if GAZEBO_MAJOR_VERSION < 9
+	 // save the Position of joint in a map
+	 #if GAZEBO_MAJOR_VERSION < 9
          jointAngles[(*jit)->GetName()] = (*jit)->GetAngle(0).Radian();
-	     #else
-	     jointAngles[(*jit)->GetName()] = (*jit)->Position(0);
-	     #endif
-	 
+	 std::cerr << "Target angle of" << (*jit) << "is" << (*jit)->GetAngle(0).Radian() << "\n";
+	 #else
+	 jointAngles[(*jit)->GetName()] = (*jit)->Position(0);
+	 std::cerr << "Target angle of" << (*jit)->GetName() << " is " << (*jit)->Position(0) << "\n";
+	 #endif	 
       }
       // Spin up the queue helper thread.
       this->rosQueueThread = std::thread(std::bind(&MyarmPlugin::QueueThread, this));
@@ -95,67 +99,68 @@ namespace gazebo
     private: void ROSCallback(const std_msgs::Float32ConstPtr &_msg, std::string jointName)
     {
 	float angle = _msg->data;
-	if(angle < -90)
-	  angle = -90;
-	if(angle > 90)
-	  angle = 90;
 	float newAngle = (angle*M_PI)/180;
 	// you update the position of where you want the joint to move
 	this->jointAngles[jointName] = newAngle;
+	std::cerr << "Angle:" << newAngle << "\n";
         return;
     }
     // Gets called, everytime the world is updated
     private: void OnUpdate()
     {
-	  // compute the steptime for the PID
-	  #if GAZEBO_MAJOR_VERSION < 9
-	  common::Time currTime = this->model->GetWorld()->GetSimTime();
-	  #else
-	  common::Time currTime = this->model->GetWorld()->SimTime();
-	  #endif
-	  common::Time stepTime = currTime - this->prevUpdateTime;
-	  this->prevUpdateTime = currTime;
+      // compute the steptime for the PID
+      #if GAZEBO_MAJOR_VERSION < 9
+      common::Time currTime = this->model->GetWorld()->GetSimTime();
+      #else
+      common::Time currTime = this->model->GetWorld()->SimTime();
+      #endif
+      common::Time stepTime = currTime - this->prevUpdateTime;
+      this->prevUpdateTime = currTime;
 
-	  for(auto it=this->joints.begin(); it!=joints.end(); ++it)
+      for(auto it=this->joints.begin(); it!=joints.end(); ++it)
       {		
-		// set the current position of the joint, the target position 
-		// and the maximum effort limit
-		double pos_target = this->jointAngles[(*it)];
-		#if GAZEBO_MAJOR_VERSION < 9
-		double pos_curr = this->model->GetJoint(*it)->GetAngle(0).Radian();
-		#else
-		double pos_curr = this->model->GetJoint(*it)->Position(0);
-		#endif
-		double max_cmd = this->joint_max_effort;
+	// set the current position of the joint, the target position 
+	// and the maximum effort limit
+	double pos_target = this->jointAngles[(*it)];
+	#if GAZEBO_MAJOR_VERSION < 9
+	double pos_curr = this->model->GetJoint(*it)->GetAngle(0).Radian();
+	#else
+	double pos_curr = this->model->GetJoint(*it)->Position(0);
+	#endif
+	double max_cmd = this->joint_max_effort;
 
-		// calculate the error between the current position and the target one
-		double pos_err = pos_curr - pos_target;
+	// calculate the error between the current position and the target one
+	double pos_err = pos_curr - pos_target;
 
-		// compute the effort via the PID, which you will apply on the joint
-		double effort_cmd = this->pid.Update(pos_err, stepTime);
+	// compute the effort via the PID, which you will apply on the joint
+	double effort_cmd = this->pid.Update(pos_err, stepTime);
 
-		// check if the effort is larger than the maximum permitted one
-		effort_cmd = effort_cmd > max_cmd ? max_cmd :
-			    (effort_cmd < -max_cmd ? -max_cmd : effort_cmd);
+	// check if the effort is larger than the maximum permitted one
+	effort_cmd = effort_cmd > max_cmd ? max_cmd :
+		    (effort_cmd < -max_cmd ? -max_cmd : effort_cmd);
 
-		// apply the force on the joint
-		this->model->GetJoint(*it)->SetForce(0, effort_cmd);
-	  }
-        return;
+	// apply the force on the joint
+	this->model->GetJoint(*it)->SetForce(0, effort_cmd);
+      }
+      return;
     }
 
     ///  Pointer to the model.
     private: physics::ModelPtr model;
     ///  Pointer to the joint.
     private: physics::JointPtr joint;
-    ///  A PID controller for the joint.
+    ///  3 PID controllers for the 3 joints.
     private: common::PID pid;
+    //private: common::PID pidSmall;
+    //private: common::PID pidMiddle;
+    //private: common::PID pidBig;
+
     // Pointer for UpdateEvent in Gazebo
     private: event::ConnectionPtr updateConnection;
     private: common::Time prevUpdateTime;
     
-    private: double joint_target_pos; //replaced with map
-    private: float joint_max_effort = 10;
+    //private: double joint_target_pos; //replaced with map
+    private: float joint_max_effort = 100;
     //List with all subscribers
     private: std::list<ros::Subscriber> rosSubList;
     //List with all revolute joint names
