@@ -24,7 +24,7 @@
     <link name='Bodenplatte'>
       <pose frame=''>-0.110501 -0 -0.267273 0 -0 0</pose>
       <inertial>
-        <mass>10</mass>
+        <mass>10000</mass>
         <inertia>
           <ixx>836.333</ixx>
           <ixy>0</ixy>
@@ -245,7 +245,7 @@
         </surface>
       </collision>
     </link>
-<!-- 1. Teil des kleinen Gelenks -->
+<!-- 1. Teil des kleinen Gelenks --
     <link name='KleinesGelenk1'>
       <pose frame=''>-0.047148 -0.00074 1.18762 0 1.5707 0</pose>
       <inertial>
@@ -322,7 +322,7 @@
         </surface>
       </collision>
     </link>
-<!-- 2. Teil des kleinen Gelenks -->
+<!-- 2. Teil des kleinen Gelenks --
     <link name='KleinesGelenk2'>
       <pose frame=''>0.085 -0.00074 1.15363 0 -0 0</pose>
       <inertial>
@@ -712,7 +712,7 @@
       <child>GrossesGelenk1</child>
       <pose frame=''>0 0 0 3.14159 -1.57079 3.14159</pose>
       <axis>
-        <xyz>0 0 -1</xyz>
+        <xyz>0 0 1</xyz>
         <use_parent_model_frame>0</use_parent_model_frame>
         <limit>
           <lower>-1.79769e+308</lower>
@@ -723,8 +723,8 @@
         <dynamics>
           <spring_reference>0</spring_reference>
           <spring_stiffness>0</spring_stiffness>
-          <damping>0</damping>
-          <friction>1</friction>
+          <damping>100</damping>
+          <friction>50</friction>
         </dynamics>
       </axis>
       <physics>
@@ -775,7 +775,7 @@
         <dynamics>
           <spring_reference>0</spring_reference>
           <spring_stiffness>0</spring_stiffness>
-          <damping>0</damping>
+          <damping>50</damping>
           <friction>1</friction>
         </dynamics>
       </axis>
@@ -792,7 +792,7 @@
         </ode>
       </physics>
     </joint>
-<!-- (Vertikal) rotierende Verbindung innerhalb des kleinen Gelenks -->
+<!-- (Vertikal) rotierende Verbindung innerhalb des kleinen Gelenks --
     <joint name='KleinesGelenkLink' type='revolute'>
       <parent>KleinesGelenk1</parent>
       <child>KleinesGelenk2</child>
@@ -825,7 +825,7 @@
           </suspension>
         </ode>
       </physics>
-    </joint>
+    </joint>-->
 <!-- (horizontal) rotierende Verbindung zwischen mittlerem Gelenk und Oberschwinge -->
     <joint name='Mittel_Oberschwinge' type='revolute'>
       <parent>MittleresGelenk1</parent>
@@ -843,8 +843,8 @@
         <dynamics>
           <spring_reference>0</spring_reference>
           <spring_stiffness>0</spring_stiffness>
-          <damping>0</damping>
-          <friction>1</friction>
+          <damping>100</damping>
+          <friction>50</friction>
         </dynamics>
       </axis>
       <physics>
@@ -877,7 +877,7 @@
         <dynamics>
           <spring_reference>0</spring_reference>
           <spring_stiffness>0</spring_stiffness>
-          <damping>0</damping>
+          <damping>50</damping>
           <friction>1</friction>
         </dynamics>
       </axis>
@@ -894,7 +894,7 @@
         </ode>
       </physics>
     </joint>
-<!-- feste Verbindung von Oberschwinge mit kleinem Gelenk -->
+<!-- feste Verbindung von Oberschwinge mit kleinem Gelenk --
     <joint name='Oberschwinge_KleinesGelenk' type='fixed'>
       <parent>Oberschwinge</parent>
       <child>KleinesGelenk1</child>
@@ -911,7 +911,7 @@
           </suspension>
         </ode>
       </physics>
-    </joint>
+    </joint>-->
 <!-- feste Verbindung von Unterschwinge mit mittlerem Gelenk -->
     <joint name='Unterschwinge_Mittel' type='fixed'>
       <parent>Unterschwinge</parent>
@@ -930,24 +930,7 @@
         </ode>
       </physics>
     </joint>
-<!-- feste Verbindung von Bodenplatte und Welt --
-    <joint name='WorldAnker' type='fixed'>
-      <parent>model://ground_plane</parent>
-      <child>Bodenplatte</child>
-      <pose frame=''>0 0 0 0 -0 0</pose>
-      <physics>
-        <ode>
-          <limit>
-            <cfm>0</cfm>
-            <erp>0.2</erp>
-          </limit>
-          <suspension>
-            <cfm>0</cfm>
-            <erp>0.2</erp>
-          </suspension>
-        </ode>
-      </physics>
-    </joint> -->
+
 
 
     <static>0</static>
