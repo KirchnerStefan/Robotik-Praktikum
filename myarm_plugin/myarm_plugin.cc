@@ -42,7 +42,7 @@ namespace gazebo
       physics::Joint_V jointVector = this->model->GetJoints();
        
       // Setup a PID-controller.
-      this->pid = common::PID(1500,0,0);
+      this->pid = common::PID(3000,0,0);
       //this->pidSmall = common::PID(5,0.1,0.1,5,-5);
       //this->pidMiddle = common::PID(40,2.5,10,5,-5);
       //this->pidBig = common::PID(50,2,10,5,-5);
