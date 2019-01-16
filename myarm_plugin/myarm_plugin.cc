@@ -42,7 +42,7 @@ namespace gazebo
       physics::Joint_V jointVector = this->model->GetJoints();
        
       // Setup a PID-controller.
-      this->pid = common::PID(100,0,0.1);
+      this->pid = common::PID(1500,0,0);
       //this->pidSmall = common::PID(5,0.1,0.1,5,-5);
       //this->pidMiddle = common::PID(40,2.5,10,5,-5);
       //this->pidBig = common::PID(50,2,10,5,-5);
@@ -75,11 +75,11 @@ namespace gazebo
 
 	 // save the Position of joint in a map
 	 #if GAZEBO_MAJOR_VERSION < 9
-         jointAngles[(*jit)->GetName()] = (*jit)->GetAngle(0).Radian();
-	 std::cerr << "Target angle of" << (*jit) << " is " << (*jit)->GetAngle(0).Radian() << "\n";
+        jointAngles[(*jit)->GetName()] = (*jit)->GetAngle(0).Radian();
+	 	std::cerr << "Target angle of " << (*jit)->GetName() << " is " << (*jit)->GetAngle(0).Radian() << "\n";
 	 #else
-	 jointAngles[(*jit)->GetName()] = (*jit)->Position(0);
-	 std::cerr << "Target angle of" << (*jit)->GetName() << " is " << (*jit)->Position(0) << "\n";
+	 	jointAngles[(*jit)->GetName()] = (*jit)->Position(0);
+	 	std::cerr << "Target angle of " << (*jit)->GetName() << " is " << (*jit)->Position(0) << "\n";
 	 #endif	 
       }
       // Spin up the queue helper thread.
