@@ -723,7 +723,7 @@
         <dynamics>
           <spring_reference>0</spring_reference>
           <spring_stiffness>0</spring_stiffness>
-          <damping>100</damping>
+          <damping>150</damping>
           <friction>50</friction>
         </dynamics>
       </axis>
