@@ -7,7 +7,7 @@ int main(int argc, char **argv)
 
   ros::NodeHandle n;
 
-  ros::Publisher chatter_pub = n.advertise<std_msgs::Float32>("/MyarmPlugin/myownArm/lowerArm_to_wrist", 1000);
+  ros::Publisher chatter_pub = n.advertise<std_msgs::Float32>("", 1000);
   //Wiederhole mit 1 Hz
   ros::Rate loop_rate(1);
 
