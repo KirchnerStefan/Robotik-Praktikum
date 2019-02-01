@@ -7,7 +7,7 @@ https://github.com/sdipendra/ros-projects/blob/master/src/keyboard_non_blocking_
 
 #include <ros/ros.h>
 #include <termios.h>
-#include "std_msgs/String.h"
+#include "std_msgs/Int32.h"
 
 char getch()
 {
@@ -55,40 +55,16 @@ int main(int argc, char **argv)
 	ros::init(argc, argv, "key_input_node");
 	ros::NodeHandle n;
 	//topic where pressed key gets posted
-	ros::Publisher keyboard_input_publisher = n.advertise<std_msgs::String>("keyboard_input", 1000);
-	ros::Rate loop_rate(25);
+	ros::Publisher keyboard_input_publisher = n.advertise<std_msgs::Int32>("keyboard_input", 10);
+	ros::Rate loop_rate(50);
 	while (ros::ok())
 	{
 		int c = 0;
+		std_msgs::Int32 msg;
 		c=getch();
-		std_msgs::String msg;
+		msg.data = c;
 		ROS_INFO("%c", c);
-		std::cerr << "c is " << c << "\n";
-		switch(c) 
-		{
-			//grossesGelenk vor/zureck
-			case 113: 
-			  msg.data = 'q';
-			  break;
-			case 97: 
-			  msg.data = 'a';
-			  break;
-			//mittleresGelenk vor/zurueck
-			case 119: 
-			  msg.data = 'w';
-			  break;
-			case 115: 
-			  msg.data = 's';
-			  break;
-			//kleinesGelenk vor/zurueck			
-			case 101: 
-			  msg.data = 'e';
-			  break;
-			case 100: 
-			  msg.data = 'd';
-			  break;
-			default: break;
-		}
+		//std::cerr << c << "\n";
 		keyboard_input_publisher.publish(msg);
 		ros::spinOnce();
 		loop_rate.sleep();
