@@ -8,13 +8,12 @@
 -	cmake ../ 
 -	make 
 -	export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:(your path to)/myarm_plugin/build
-- It is important to export the path and start gazebo from build-folder. 
-  Otherwise gazebo will possibly not recognize the shared library for the plugin.
+- It is important to export the path and start gazebo from build-folder. Otherwise gazebo will possibly not recognize the shared library for the plugin.
 3. in new terminal:  
 -	roscore &
 -	gazebo --verbose ../myarm.world &
--  you should be able to see topics
-5.   for using the input reader for keyboard:
+- you should be able to see topics
+5. for using the input reader for keyboard:
 - open new terminal 
 - cd catkin_ws 
 - catkin_make
