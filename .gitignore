@@ -1,0 +1,3 @@
+#ignore things build to run project
+build/
+devel/
