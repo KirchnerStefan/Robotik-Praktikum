@@ -1,26 +1,6 @@
-<?xml version="1.0" ?>
-<sdf version="1.6">
-  <world name="default">
-
-	<!-- A global light source -->
-	<include>
-	  <uri>model://sun</uri>
-	</include>
-
-	<!-- A ground plane -->
-	<include>
-	  <uri>model://ground_plane</uri>
-	</include>
-
-	<!-- Bei Gelegenheit Model in eigene Datei auslagern.
-		 Wenn moeglich, Links vermeiden. Objekte ueber <visual> eines Links
-		 vergroessern. (z.B. Finger = finger[Zylinder] + knuckle[Kugel])
-	-->	
-  
+<?xml version='1.0'?>
+<sdf version='1.6'>
   <model name='myownArm'>
-<!-- LINK ELEMENTE-->
-
-<!-- Bodenplatte -->
     <link name='Bodenplatte'>
       <pose frame=''>-0.110501 -0 -0.267273 0 -0 0</pose>
       <inertial>
@@ -90,13 +70,37 @@
                 <slip>0</slip>
               </ode>
             </torsional>
-          </friction>         
+          </friction>
+          <bounce>
+            <restitution_coefficient>0</restitution_coefficient>
+            <threshold>1e+06</threshold>
+          </bounce>
+          <contact>
+            <collide_without_contact>0</collide_without_contact>
+            <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
+            <collide_bitmask>1</collide_bitmask>
+            <ode>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+              <max_vel>0.01</max_vel>
+              <min_depth>0</min_depth>
+            </ode>
+            <bullet>
+              <split_impulse>1</split_impulse>
+              <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+            </bullet>
+          </contact>
         </surface>
       </collision>
     </link>
-<!-- 1. Teil des Großen Gelenks -->
     <link name='GrossesGelenk1'>
-      <pose frame=''>-0.110501 -0 -0.129742 3.13788 1.57079 3.13788</pose>
+      <pose frame=''>-0.110501 0 -0.129742 3.13785 1.57079 3.13785</pose>
       <inertial>
         <mass>13</mass>
         <inertia>
@@ -166,12 +170,36 @@
               </ode>
             </torsional>
           </friction>
+          <bounce>
+            <restitution_coefficient>0</restitution_coefficient>
+            <threshold>1e+06</threshold>
+          </bounce>
+          <contact>
+            <collide_without_contact>0</collide_without_contact>
+            <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
+            <collide_bitmask>1</collide_bitmask>
+            <ode>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+              <max_vel>0.01</max_vel>
+              <min_depth>0</min_depth>
+            </ode>
+            <bullet>
+              <split_impulse>1</split_impulse>
+              <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+            </bullet>
+          </contact>
         </surface>
       </collision>
     </link>
-<!-- 2. Teil des großen Gelenks-->
     <link name='GrossesGelenk2'>
-      <pose frame=''>0.108856 -0 -0.129742 3.13347 1.57079 3.13347</pose>
+      <pose frame=''>0.108856 0 -0.129742 3.13341 1.57079 3.13341</pose>
       <inertial>
         <mass>13</mass>
         <inertia>
@@ -241,11 +269,34 @@
               </ode>
             </torsional>
           </friction>
-          
+          <bounce>
+            <restitution_coefficient>0</restitution_coefficient>
+            <threshold>1e+06</threshold>
+          </bounce>
+          <contact>
+            <collide_without_contact>0</collide_without_contact>
+            <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
+            <collide_bitmask>1</collide_bitmask>
+            <ode>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+              <max_vel>0.01</max_vel>
+              <min_depth>0</min_depth>
+            </ode>
+            <bullet>
+              <split_impulse>1</split_impulse>
+              <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+            </bullet>
+          </contact>
         </surface>
       </collision>
     </link>
-<!-- 1. Teil des kleinen Gelenks -->
     <link name='KleinesGelenk1'>
       <pose frame=''>-0.047148 -0.00074 1.18762 0 1.5707 0</pose>
       <inertial>
@@ -318,11 +369,34 @@
               </ode>
             </torsional>
           </friction>
-         
+          <bounce>
+            <restitution_coefficient>0</restitution_coefficient>
+            <threshold>1e+06</threshold>
+          </bounce>
+          <contact>
+            <collide_without_contact>0</collide_without_contact>
+            <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
+            <collide_bitmask>1</collide_bitmask>
+            <ode>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+              <max_vel>0.01</max_vel>
+              <min_depth>0</min_depth>
+            </ode>
+            <bullet>
+              <split_impulse>1</split_impulse>
+              <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+            </bullet>
+          </contact>
         </surface>
       </collision>
     </link>
-<!-- 2. Teil des kleinen Gelenks -->
     <link name='KleinesGelenk2'>
       <pose frame=''>0.085 -0.00074 1.15363 0 -0 0</pose>
       <inertial>
@@ -395,11 +469,34 @@
               </ode>
             </torsional>
           </friction>
-          
+          <bounce>
+            <restitution_coefficient>0</restitution_coefficient>
+            <threshold>1e+06</threshold>
+          </bounce>
+          <contact>
+            <collide_without_contact>0</collide_without_contact>
+            <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
+            <collide_bitmask>1</collide_bitmask>
+            <ode>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+              <max_vel>0.01</max_vel>
+              <min_depth>0</min_depth>
+            </ode>
+            <bullet>
+              <split_impulse>1</split_impulse>
+              <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+            </bullet>
+          </contact>
         </surface>
       </collision>
     </link>
-<!-- 1. Teil des Mittleren Gelenks -->
     <link name='MittleresGelenk1'>
       <pose frame=''>-0.047148 -0.00074 0.576617 3.01682 1.56535 3.00517</pose>
       <inertial>
@@ -471,11 +568,34 @@
               </ode>
             </torsional>
           </friction>
-          
+          <bounce>
+            <restitution_coefficient>0</restitution_coefficient>
+            <threshold>1e+06</threshold>
+          </bounce>
+          <contact>
+            <collide_without_contact>0</collide_without_contact>
+            <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
+            <collide_bitmask>1</collide_bitmask>
+            <ode>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+              <max_vel>0.01</max_vel>
+              <min_depth>0</min_depth>
+            </ode>
+            <bullet>
+              <split_impulse>1</split_impulse>
+              <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+            </bullet>
+          </contact>
         </surface>
       </collision>
     </link>
-<!-- 2. Teil des mittleren Gelenks -->
     <link name='MittleresGelenk2'>
       <pose frame=''>0.109117 -3.6e-05 0.576944 3.01682 1.56535 3.00517</pose>
       <inertial>
@@ -547,11 +667,34 @@
               </ode>
             </torsional>
           </friction>
-          
+          <bounce>
+            <restitution_coefficient>0</restitution_coefficient>
+            <threshold>1e+06</threshold>
+          </bounce>
+          <contact>
+            <collide_without_contact>0</collide_without_contact>
+            <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
+            <collide_bitmask>1</collide_bitmask>
+            <ode>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+              <max_vel>0.01</max_vel>
+              <min_depth>0</min_depth>
+            </ode>
+            <bullet>
+              <split_impulse>1</split_impulse>
+              <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+            </bullet>
+          </contact>
         </surface>
       </collision>
     </link>
-<!-- Das Verbindungsstück von Mittlerem und kleinem Gelenk -->
     <link name='Oberschwinge'>
       <pose frame=''>-0.047148 -0.00074 0.892871 0 -0 0</pose>
       <inertial>
@@ -623,11 +766,34 @@
               </ode>
             </torsional>
           </friction>
-          
+          <bounce>
+            <restitution_coefficient>0</restitution_coefficient>
+            <threshold>1e+06</threshold>
+          </bounce>
+          <contact>
+            <collide_without_contact>0</collide_without_contact>
+            <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
+            <collide_bitmask>1</collide_bitmask>
+            <ode>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+              <max_vel>0.01</max_vel>
+              <min_depth>0</min_depth>
+            </ode>
+            <bullet>
+              <split_impulse>1</split_impulse>
+              <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+            </bullet>
+          </contact>
         </surface>
       </collision>
     </link>
-<!-- Das Verbindungsstück von Großem und Mittlerem Gelenk -->
     <link name='Unterschwinge'>
       <pose frame=''>0.108856 -0.005839 0.239161 0 -0 0</pose>
       <inertial>
@@ -699,14 +865,34 @@
               </ode>
             </torsional>
           </friction>
-          
+          <bounce>
+            <restitution_coefficient>0</restitution_coefficient>
+            <threshold>1e+06</threshold>
+          </bounce>
+          <contact>
+            <collide_without_contact>0</collide_without_contact>
+            <collide_without_contact_bitmask>1</collide_without_contact_bitmask>
+            <collide_bitmask>1</collide_bitmask>
+            <ode>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+              <max_vel>0.01</max_vel>
+              <min_depth>0</min_depth>
+            </ode>
+            <bullet>
+              <split_impulse>1</split_impulse>
+              <split_impulse_penetration_threshold>-0.01</split_impulse_penetration_threshold>
+              <soft_cfm>0</soft_cfm>
+              <soft_erp>0.2</soft_erp>
+              <kp>1e+13</kp>
+              <kd>1</kd>
+            </bullet>
+          </contact>
         </surface>
       </collision>
     </link>
-
-<!-- JOINT ELEMENTE-->
-
-<!-- (horizontal) rotierende Verbindung von grossem Gelenk und Bodenplatte -->
     <joint name='Gross_Bodenplatte' type='revolute'>
       <parent>Bodenplatte</parent>
       <child>GrossesGelenk1</child>
@@ -740,7 +926,6 @@
         </ode>
       </physics>
     </joint>
-<!-- feste Verbindung von grossem Gelenk und Unterschwinge-->
     <joint name='Gross_Unterschwinge' type='fixed'>
       <parent>GrossesGelenk2</parent>
       <child>Unterschwinge</child>
@@ -758,7 +943,6 @@
         </ode>
       </physics>
     </joint>
-<!-- (Vertikal) rotierende Verbindung innerhalb des grossen Gelenks -->
     <joint name='GrossesGelenkLink' type='revolute'>
       <parent>GrossesGelenk1</parent>
       <child>GrossesGelenk2</child>
@@ -792,7 +976,6 @@
         </ode>
       </physics>
     </joint>
-<!-- (Vertikal) rotierende Verbindung innerhalb des kleinen Gelenks -->
     <joint name='KleinesGelenkLink' type='revolute'>
       <parent>KleinesGelenk1</parent>
       <child>KleinesGelenk2</child>
@@ -826,7 +1009,6 @@
         </ode>
       </physics>
     </joint>
-<!-- (horizontal) rotierende Verbindung zwischen mittlerem Gelenk und Oberschwinge -->
     <joint name='Mittel_Oberschwinge' type='revolute'>
       <parent>MittleresGelenk1</parent>
       <child>Oberschwinge</child>
@@ -860,7 +1042,6 @@
         </ode>
       </physics>
     </joint>
-<!-- (Vertikal) rotierende Verbindung innerhalb des mittleren Gelenks -->
     <joint name='MittleresGelenkLink' type='revolute'>
       <parent>MittleresGelenk1</parent>
       <child>MittleresGelenk2</child>
@@ -894,7 +1075,6 @@
         </ode>
       </physics>
     </joint>
-<!-- feste Verbindung von Oberschwinge mit kleinem Gelenk -->
     <joint name='Oberschwinge_KleinesGelenk' type='fixed'>
       <parent>Oberschwinge</parent>
       <child>KleinesGelenk1</child>
@@ -912,7 +1092,6 @@
         </ode>
       </physics>
     </joint>
-<!-- feste Verbindung von Unterschwinge mit mittlerem Gelenk -->
     <joint name='Unterschwinge_Mittel' type='fixed'>
       <parent>Unterschwinge</parent>
       <child>MittleresGelenk2</child>
@@ -930,14 +1109,8 @@
         </ode>
       </physics>
     </joint>
-
-
-
     <static>0</static>
     <allow_auto_disable>1</allow_auto_disable>
-
-<!-- Einbinden des Plugins zur Kontrolle des Arms -->
     <plugin name='myarm_plugin' filename='libmyarm_plugin.so'/>
   </model>
-  </world>
 </sdf>

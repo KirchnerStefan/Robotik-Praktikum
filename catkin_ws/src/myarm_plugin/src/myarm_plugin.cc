@@ -80,15 +80,21 @@ namespace gazebo
 
       //create topic for keyboardlistener and sub to it
       ros::SubscribeOptions so2 = 
-		 ros::SubscribeOptions::create<std_msgs::Int32>(
+                 ros::SubscribeOptions::create<std_msgs::Int32>(
 		      "/keyboard_input",1,boost::bind(&MyarmPlugin::KeyboardCallback, this, _1), 
 		      ros::VoidPtr(), &this->keyboardQueue);
       this->rosSubList.push_back(this->rosNode->subscribe(so2));
-
+      //create topic for gripper and sub to it
+      ros::SubscribeOptions so3 =
+                 ros::SubscribeOptions::create<std_msgs::Float32>(
+                      "/gripper",1,boost::bind(&MyarmPlugin::GripperCallback, this, _1),
+                      ros::VoidPtr(), &this->gripperQueue);
+      this->rosSubList.push_back(this->rosNode->subscribe(so3));
 
       // Spin up the queue helper threads.
       this->rosQueueThread = std::thread(std::bind(&MyarmPlugin::QueueThread, this));
       this->keyboardQueueThread = std::thread(std::bind(&MyarmPlugin::KeyboardQueueThread, this));
+      this->gripperQueueThread = std::thread(std::bind(&MyarmPlugin::GripperThread, this));
     }
 
     //  ROS helper function that processes messages
@@ -100,16 +106,6 @@ namespace gazebo
           this->rosQueue.callAvailable(ros::WallDuration(timeout));
        }
     }
-    // take value from message and write it to map
-    private: void AngleCallback(const std_msgs::Float32ConstPtr &_msg, std::string jointName)
-    {
-	   float angle = _msg->data;
-	   float newAngle = (angle*M_PI)/180;
-	   // you update the position of where you want the joint to move
-	   this->jointAngles[jointName] = newAngle;
-	   std::cerr << "Angle:" << newAngle << "\n";
-       return;
-    }
     //  Queuefunction for Keyboard-Inputs
     private: void KeyboardQueueThread()
     {
@@ -119,6 +115,25 @@ namespace gazebo
           this->keyboardQueue.callAvailable(ros::WallDuration(timeout));
        }
     }
+      //  Queuefunction for Gripper
+      private: void GripperQueueThread()
+      {
+         static const double timeout = 0.01;
+         while (this->rosNode->ok())
+         {
+            this->gripperQueue.callAvailable(ros::WallDuration(timeout));
+         }
+      }
+      // take value from message and write it to map
+      private: void AngleCallback(const std_msgs::Float32ConstPtr &_msg, std::string jointName)
+      {
+             float angle = _msg->data;
+             float newAngle = (angle*M_PI)/180;
+             // you update the position of where you want the joint to move
+             this->jointAngles[jointName] = newAngle;
+             std::cerr << "Angle:" << newAngle << "\n";
+         return;
+      }
     // keyboardcallback
     private: void KeyboardCallback(const std_msgs::Int32ConstPtr &_msg)
     {
@@ -191,6 +206,13 @@ namespace gazebo
 	  }
 	  return;
     }
+      // take value from message and write it to map
+      private: void GripperCallback(const std_msgs::Float32ConstPtr &_msg)
+      {
+             float angle = _msg->data;
+             float newAngle = (angle*M_PI)/180;
+         return;
+      }
 
     // Gets called, everytime the world is updated
     private: void OnUpdate()
@@ -231,11 +253,11 @@ namespace gazebo
       return;
     }
 
-    ///  Pointer to the model.
+    //  Pointer to the model.
     private: physics::ModelPtr model;
-    ///  Pointer to the joint.
+    //  Pointer to the joint.
     private: physics::JointPtr joint;
-    ///  3 PID controllers for the 3 joints.
+    //  3 PID controllers for the 3 joints.
     private: common::PID pid;
 
     // Pointer for UpdateEvent in Gazebo
@@ -243,6 +265,7 @@ namespace gazebo
     private: common::Time prevUpdateTime;
     
     private: float joint_max_effort = 300;
+    private: float gripper_max_effort = 40;
     //List with all subscribers
     private: std::list<ros::Subscriber> rosSubList;
     //List with all revolute joint names
@@ -254,10 +277,12 @@ namespace gazebo
     private: std::unique_ptr<ros::NodeHandle> rosNode;
     //  A ROS callbackqueue that helps process messages
     private: ros::CallbackQueue rosQueue;
+    private: ros::CallbackQueue gripperQueue;
     private: ros::CallbackQueue keyboardQueue;
     //  A thread the keeps running the rosQueue
     private: std::thread rosQueueThread;
     private: std::thread keyboardQueueThread;
+    private: std::thread gripperQueueThread;
   };
 
   // Tell Gazebo about this plugin, so that Gazebo can call Load on this plugin.
