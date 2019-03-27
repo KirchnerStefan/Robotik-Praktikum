@@ -147,7 +147,6 @@ namespace gazebo
       }
 
 
-
       // take value from message and write it to map
       private: void AngleCallback(const std_msgs::Float32ConstPtr &_msg, std::string jointName)
       {
@@ -216,8 +215,6 @@ namespace gazebo
          this->jointAngles["HandSlide2"] = t;
          return;
       }
-
-
 
     // Gets called, everytime the world is updated
     private: void OnUpdate()
