@@ -8,5 +8,5 @@
  - roslaunch myarm_plugin myarm.launch &
  - rosrun keyboard_non_blocking_input keyboard_non_blocking_input_node
 3. Your keyboard inputs get captured and move the arm 
- - move the big joint with q/a, the middle one with w/s and the small one with e/d
- - rotate around the base with y/x, rotate the "hand" with c/v
+ - select joint with q/a
+ - move joint forward/backward with w/s

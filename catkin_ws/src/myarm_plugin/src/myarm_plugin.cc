@@ -40,7 +40,6 @@ namespace gazebo
       this->updateConnection = event::Events::ConnectWorldUpdateBegin(boost::bind(&MyarmPlugin::OnUpdate, this));
       //store all Joints for later use
       physics::Joint_V jointVector = this->model->GetJoints();
-       
       // Setup a PID-controller.
       this->pid = common::PID(3000,0,0);
 
@@ -53,29 +52,50 @@ namespace gazebo
       }
       this->rosNode.reset(new ros::NodeHandle("gazebo_client"));
 
+      int x = 0;
       //create Topics (wich get passed an Angle) and Subscribe to them
       for(physics::Joint_V::iterator jit=jointVector.begin(); jit!=jointVector.end(); ++jit)
       {
          // if revolute joint. if not, ignore joint
          if((*jit)->GetType() != 576)
 	 	    continue;    
-	     // Create topics for SETTING POSITION
-	     std::string subPath = "/" + (*jit)->GetName() + "/setAngle";
-	     ros::SubscribeOptions so = 
-		      ros::SubscribeOptions::create<std_msgs::Float32>(
-		      subPath,1,boost::bind(&MyarmPlugin::AngleCallback, this, _1, (*jit)->GetName()),
-		      ros::VoidPtr(), &this->rosQueue);
-	     // add subscriber to list
+         // Create topics for SETTING POSITION
+         std::string subPath = "/" + (*jit)->GetName() + "/setAngle";
+         ros::SubscribeOptions so =
+                  ros::SubscribeOptions::create<std_msgs::Float32>(
+                  subPath,1,boost::bind(&MyarmPlugin::AngleCallback, this, _1, (*jit)->GetName()),
+                  ros::VoidPtr(), &this->rosQueue);
+         // add subscriber to list
          this->rosSubList.push_back(this->rosNode->subscribe(so));
-	     std::cerr << "Topic name: " << subPath << "\n";
+         std::cerr << "Topic name: " << subPath << "\n";
          joints.push_back((*jit)->GetName());
 
-	     // save the Position of joint in a map
-	     #if GAZEBO_MAJOR_VERSION < 9
-           jointAngles[(*jit)->GetName()] = (*jit)->GetAngle(0).Radian();
-	     #else
-	       jointAngles[(*jit)->GetName()] = (*jit)->Position(0);
-	     #endif	 
+         // add rotational joints to Array
+         jointArray[x] = (*jit)->GetName();
+         x++;
+
+         // save the Position of joint in a map
+         #if GAZEBO_MAJOR_VERSION < 9
+            jointAngles[(*jit)->GetName()] = (*jit)->GetAngle(0).Radian();
+         #else
+            jointAngles[(*jit)->GetName()] = (*jit)->Position(0);
+         #endif
+      }
+
+      // add the prismatic joints for gripper to list and map
+      for(physics::Joint_V::iterator jit=jointVector.begin(); jit!=jointVector.end(); ++jit)
+      {
+         // if prismatic joint. if not, ignore joint
+         if((*jit)->GetType() != 1088)
+                    continue;
+         joints.push_back((*jit)->GetName());
+
+         // save the Position of joint in a map
+         #if GAZEBO_MAJOR_VERSION < 9
+            jointAngles[(*jit)->GetName()] = (*jit)->GetAngle(0).Radian();
+         #else
+            jointAngles[(*jit)->GetName()] = (*jit)->Position(0);
+         #endif
       }
 
       //create topic for keyboardlistener and sub to it
@@ -84,6 +104,7 @@ namespace gazebo
 		      "/keyboard_input",1,boost::bind(&MyarmPlugin::KeyboardCallback, this, _1), 
 		      ros::VoidPtr(), &this->keyboardQueue);
       this->rosSubList.push_back(this->rosNode->subscribe(so2));
+
       //create topic for gripper and sub to it
       ros::SubscribeOptions so3 =
                  ros::SubscribeOptions::create<std_msgs::Float32>(
@@ -94,7 +115,7 @@ namespace gazebo
       // Spin up the queue helper threads.
       this->rosQueueThread = std::thread(std::bind(&MyarmPlugin::QueueThread, this));
       this->keyboardQueueThread = std::thread(std::bind(&MyarmPlugin::KeyboardQueueThread, this));
-      this->gripperQueueThread = std::thread(std::bind(&MyarmPlugin::GripperThread, this));
+      this->gripperQueueThread = std::thread(std::bind(&MyarmPlugin::GripperQueueThread, this));
     }
 
     //  ROS helper function that processes messages
@@ -124,6 +145,8 @@ namespace gazebo
             this->gripperQueue.callAvailable(ros::WallDuration(timeout));
          }
       }
+
+
       // take value from message and write it to map
       private: void AngleCallback(const std_msgs::Float32ConstPtr &_msg, std::string jointName)
       {
@@ -134,83 +157,62 @@ namespace gazebo
              std::cerr << "Angle:" << newAngle << "\n";
          return;
       }
-    // keyboardcallback
-    private: void KeyboardCallback(const std_msgs::Int32ConstPtr &_msg)
-    {
-	  int f = _msg->data;
-	  // how many degrees a single buttonpress moves the joint
-	  float angle = 3;
-	  switch (f)
-	  {
-	     // q : GrossesGelenk +
-	     case 113:
-		    this->jointAngles["GrossesGelenkLink"] = this->jointAngles["GrossesGelenkLink"] + (angle*M_PI)/180;
-		    std::cerr << "Angle:" << this->jointAngles["GrossesGelenkLink"] << "\n";
-	   	    break; 
 
-	     // a : GrossesGelenk -
-	     case 97:	
-		    this->jointAngles["GrossesGelenkLink"] = this->jointAngles["GrossesGelenkLink"] - (angle*M_PI)/180;
-		    std::cerr << "Angle:" << this->jointAngles["GrossesGelenkLink"] << "\n";
-		    break; 
+      // keyboardcallback
+      private: void KeyboardCallback(const std_msgs::Int32ConstPtr &_msg)
+      {
+            int f = _msg->data;
+            // how many degrees a single buttonpress moves the joint
+            float angle = (1*M_PI)/180;
+            switch (f)
+            {
+               // q : Next Joint
+               case 113:
+                    if(jointsIterator == --joints.end()){
+                        this->jointsIterator = joints.begin();}
 
-	     // w :  MittleresGelenk -
-	     case 119:	
-		    this->jointAngles["MittleresGelenkLink"] = this->jointAngles["MittleresGelenkLink"] - (angle*M_PI)/180;
-		    std::cerr << "Angle:" << this->jointAngles["MittleresGelenkLink"] << "\n";
-		    break; 
+                    this->jointsIterator++;
+                    std::cerr << "Selected Joint: "<< (*jointsIterator) << "\n";
+                    break;
 
-	     // s : MittleresGelenk +
-	     case 115:
-		    this->jointAngles["MittleresGelenkLink"] = this->jointAngles["MittleresGelenkLink"] + (angle*M_PI)/180;
-		    std::cerr << "Angle:" << this->jointAngles["MittleresGelenkLink"] << "\n";
-		    break; 
+               // a : Previous Joint
+               case 97:
+                    if(jointsIterator == ++joints.begin()){
+                        this->jointsIterator = joints.end();
+                    }
 
-	     // e : KleinesGelenk +
-	     case 101:
-		    this->jointAngles["KleinesGelenkLink"] = this->jointAngles["KleinesGelenkLink"] + (angle*M_PI)/180;
-		    std::cerr << "Angle:" << this->jointAngles["KleinesGelenkLink"] << "\n";
-		    break; 
+                    this->jointsIterator--;
+                    std::cerr << "Selected Joint: "<< (*jointsIterator) << "\n";
+                    break;
 
-	     // d : KleinesGelenk -
-	     case 100:	
-		    this->jointAngles["KleinesGelenkLink"] = this->jointAngles["KleinesGelenkLink"] - (angle*M_PI)/180;
-		    std::cerr << "Angle:" << this->jointAngles["KleinesGelenkLink"] << "\n";
-		    break;	
-	     // y : Gross_Bodenplatte -
-	     case 121:	
-		    this->jointAngles["Gross_Bodenplatte"] = this->jointAngles["Gross_Bodenplatte"] - (angle*M_PI)/180;
-		    std::cerr << "Angle:" << this->jointAngles["Gross_Bodenplatte"] << "\n";
-		    break;
+               // w :  Joint -
+               case 119:
+                    this->jointAngles[(*jointsIterator)] = this->jointAngles[(*jointsIterator)] - angle;
+                    std::cerr << "Angle of "<< (*jointsIterator) << ": " << this->jointAngles[(*jointsIterator)] << "\n";
+                    break;
 
-	     // x : Gross_Bodenplatte +
-	     case 120:	
-		    this->jointAngles["Gross_Bodenplatte"] = this->jointAngles["Gross_Bodenplatte"] + (angle*M_PI)/180;
-		    std::cerr << "Angle:" << this->jointAngles["Gross_Bodenplatte"] << "\n";
-		    break;
+               // s :  Joint +
+               case 115:
+                    this->jointAngles[(*jointsIterator)] = this->jointAngles[(*jointsIterator)] + angle;
+                    std::cerr << "Angle of "<< (*jointsIterator) << ": " << this->jointAngles[(*jointsIterator)] << "\n";
+                    break;
 
-	     // c : Mittel_Oberschwinge -
-	     case 99:	
-		    this->jointAngles["Mittel_Oberschwinge"] = this->jointAngles["Mittel_Oberschwinge"] - (angle*M_PI)/180;
-		    std::cerr << "Angle:" << this->jointAngles["Mittel_Oberschwinge"] << "\n";
-		    break;
+               // default is empty
+               default: break;
+            }
+            return;
+      }
 
-	     // v : Mittel_Oberschwinge +
-	     case 118:	
-		    this->jointAngles["Mittel_Oberschwinge"] = this->jointAngles["Mittel_Oberschwinge"] + (angle*M_PI)/180;
-		    std::cerr << "Angle:" << this->jointAngles["Mittel_Oberschwinge"] << "\n";
-		    break;
-
-	     // default is empty
-	     default: break;
-	  }
-	  return;
-    }
       // take value from message and write it to map
       private: void GripperCallback(const std_msgs::Float32ConstPtr &_msg)
       {
-             float angle = _msg->data;
-             float newAngle = (angle*M_PI)/180;
+         float t = _msg->data;
+         if(t >= 0.074)
+             t = 0.074;
+         else if(t <= 0)
+             t = 0;
+         this->jointAngles["HandSlide1"] = t;
+         this->jointAngles["HandSlide2"] = t;
          return;
       }
 
@@ -236,7 +238,7 @@ namespace gazebo
 	    #else
 	      double pos_curr = this->model->GetJoint(*it)->Position(0);
 	    #endif
-	    double max_cmd = this->joint_max_effort;
+              double max_cmd = this->joint_max_effort;
 
 	    // calculate the error between the current position and the target one
 	    double pos_err = pos_curr - pos_target; 
@@ -245,7 +247,7 @@ namespace gazebo
 	    double effort_cmd = this->pid.Update(pos_err, stepTime);
 
 	    // check if the effort is larger than the maximum permitted one
-	    //effort_cmd = effort_cmd > max_cmd ? max_cmd : (effort_cmd < -max_cmd ? -max_cmd : effort_cmd);
+            effort_cmd = effort_cmd > max_cmd ? max_cmd : (effort_cmd < -max_cmd ? -max_cmd : effort_cmd);
 
 	    // apply the force on the joint
 	    this->model->GetJoint(*it)->SetForce(0, effort_cmd);
@@ -259,7 +261,9 @@ namespace gazebo
     private: physics::JointPtr joint;
     //  3 PID controllers for the 3 joints.
     private: common::PID pid;
-
+    //
+    private: std::string jointArray[5];
+    private: int jointCounter = 0;
     // Pointer for UpdateEvent in Gazebo
     private: event::ConnectionPtr updateConnection;
     private: common::Time prevUpdateTime;
@@ -270,6 +274,7 @@ namespace gazebo
     private: std::list<ros::Subscriber> rosSubList;
     //List with all revolute joint names
     private: std::list<std::string> joints;
+    private: std::list<std::string>::iterator jointsIterator = joints.begin();
     //map with joints' angles by their names
     private: std::map<std::string, double> jointAngles;
 
