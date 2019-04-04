@@ -8,11 +8,13 @@ add_compile_options(-std=c++11)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(roscpp REQUIRED)
+find_package(rospy REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(catkin REQUIRED)
 find_package(gazebo REQUIRED)
 
 include_directories(${roscpp_INCLUDE_DIRS})
+include_directories(${rospy_INCLUDE_DIRS})
 include_directories(${std_msgs_INCLUDE_DIRS})
 include_directories(${catkin_INCLUDE_DIRS})
 include_directories(${GAZEBO_INCLUDE_DIRS})
@@ -24,11 +26,12 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GAZEBO_CXX_FLAGS}")
 
 # Build our plugin
 add_library(myarm_plugin src/myarm_plugin.cc)
-target_link_libraries(myarm_plugin ${GAZEBO_libraries} ${roscpp_LIBRARIES})
+target_link_libraries(myarm_plugin ${GAZEBO_libraries} ${roscpp_LIBRARIES} ${rospy_LIBRARIES})
 
 catkin_package(
   DEPENDS
 	roscpp
+	rospy
 	std_msgs
 	gazebo_ros
 )

@@ -1250,7 +1250,7 @@
         <use_parent_model_frame>0</use_parent_model_frame>
         <limit>
           <lower>0</lower>
-          <upper>0.07</upper>
+          <upper>0.13</upper>
           <effort>-1</effort>
           <velocity>-1</velocity>
         </limit>

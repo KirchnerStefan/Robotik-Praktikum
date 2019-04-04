@@ -55,7 +55,7 @@ int main(int argc, char **argv)
 	ros::init(argc, argv, "key_input_node");
 	ros::NodeHandle n;
 	//topic where pressed key gets posted
-	ros::Publisher keyboard_input_publisher = n.advertise<std_msgs::Int32>("keyboard_input", 10);
+        ros::Publisher keyboard_input_publisher = n.advertise<std_msgs::Int32>("keyboard_input", 1);
 	ros::Rate loop_rate(50);
 	while (ros::ok())
 	{

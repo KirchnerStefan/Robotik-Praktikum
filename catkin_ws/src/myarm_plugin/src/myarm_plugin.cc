@@ -11,6 +11,7 @@
 #include "ros/subscribe_options.h"
 #include "std_msgs/Int32.h"
 #include "std_msgs/Float32.h"
+#include "std_msgs/String.h"
 
 namespace gazebo
 {
@@ -204,15 +205,11 @@ namespace gazebo
       }
 
       // take value from message and write it to map
-      private: void GripperCallback(const std_msgs::Float32ConstPtr &_msg)
+  private: void GripperCallback(const std_msgs::Float32ConstPtr &_msg)
       {
          float t = _msg->data;
-         if(t >= 0.074)
-             t = 0.074;
-         else if(t <= 0)
-             t = 0;
-         this->jointAngles["HandSlide1"] = t;
-         this->jointAngles["HandSlide2"] = t;
+         std::cerr << "Gripper: " << t << "\n";
+         this->jointAngles["Hand_RechterFinger"] = t;
          return;
       }
 
@@ -230,6 +227,33 @@ namespace gazebo
 
       for(auto it=this->joints.begin(); it!=joints.end(); ++it)
       {		
+          // Update the Gripper
+          if(this->jointAngles[(*it)] == "Hand_RechterFinger")
+          {
+              // set the current position of the joint, the target position
+              // and the maximum effort limit
+              double pos_target = this->jointAngles[(*it)];
+              #if GAZEBO_MAJOR_VERSION < 9
+                double pos_curr = this->model->GetJoint(*it)->GetAngle(0).Radian();
+              #else
+                double pos_curr = this->model->GetJoint(*it)->Position(0);
+              #endif
+                double max_cmd = this->gripper_max_effort;
+
+              // calculate the error between the current position and the target one
+              double pos_err = pos_curr - pos_target;
+
+              // compute the effort via the PID, which you will apply on the joint
+              double effort_cmd = this->pid.Update(pos_err, stepTime);
+
+              // check if the effort is larger than the maximum permitted one
+              effort_cmd = effort_cmd > max_cmd ? max_cmd : (effort_cmd < -max_cmd ? -max_cmd : effort_cmd);
+
+              // apply the force on the joint
+              this->model->GetJoint(*it)->SetForce(0, effort_cmd);
+          }
+          else //Update all other joints
+          {
 	    // set the current position of the joint, the target position 
 	    // and the maximum effort limit
 	    double pos_target = this->jointAngles[(*it)];
@@ -251,6 +275,7 @@ namespace gazebo
 
 	    // apply the force on the joint
 	    this->model->GetJoint(*it)->SetForce(0, effort_cmd);
+          }
       }
       return;
     }
