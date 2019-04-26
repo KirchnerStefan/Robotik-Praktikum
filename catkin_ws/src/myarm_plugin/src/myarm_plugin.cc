@@ -228,7 +228,7 @@ namespace gazebo
       for(auto it=this->joints.begin(); it!=joints.end(); ++it)
       {		
           // Update the Gripper
-          if(this->jointAngles[(*it)] == "Hand_RechterFinger")
+          if((*it) == "Hand_RechterFinger")
           {
               // set the current position of the joint, the target position
               // and the maximum effort limit
