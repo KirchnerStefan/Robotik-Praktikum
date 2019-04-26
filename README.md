@@ -13,3 +13,5 @@
  - select joint with "q/a"
  - move joint forward/backward with "w/s"
  - activate voice_recognition with "d"    (only if you have "speech_recognition" installed) 
+4. Sometimes the keyboard-reader may need a restart.
+5. Voicecontrol may sometimes not act on first command.
