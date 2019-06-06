@@ -53,7 +53,6 @@ namespace gazebo
       }
       this->rosNode.reset(new ros::NodeHandle("gazebo_client"));
 
-      int x = 0;
       //create Topics (wich get passed an Angle) and Subscribe to them
       for(physics::Joint_V::iterator jit=jointVector.begin(); jit!=jointVector.end(); ++jit)
       {
@@ -286,9 +285,7 @@ namespace gazebo
     private: physics::JointPtr joint;
     //  3 PID controllers for the 3 joints.
     private: common::PID pid;
-    //
-    private: std::string jointArray[5];
-    private: int jointCounter = 0;
+
     // Pointer for UpdateEvent in Gazebo
     private: event::ConnectionPtr updateConnection;
     private: common::Time prevUpdateTime;
@@ -299,6 +296,7 @@ namespace gazebo
     private: std::list<ros::Subscriber> rosSubList;
     //List with all revolute joint names
     private: std::list<std::string> joints;
+    // iterator for saving the currently selected joint
     private: std::list<std::string>::iterator jointsIterator = joints.begin();
     //map with joints' angles by their names
     private: std::map<std::string, double> jointAngles;

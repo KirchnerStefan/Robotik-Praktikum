@@ -1,0 +1,3 @@
+<launch>
+	<param name="robot_description" textfile="$(find myarm_plugin)/models/myarm/model.urdf" />
+</launch>
