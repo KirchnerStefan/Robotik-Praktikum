@@ -70,10 +70,6 @@ namespace gazebo
          std::cerr << "Topic name: " << subPath << "\n";
          joints.push_back((*jit)->GetName());
 
-         // add rotational joints to Array
-         jointArray[x] = (*jit)->GetName();
-         x++;
-
          // save the Position of joint in a map
          #if GAZEBO_MAJOR_VERSION < 9
             jointAngles[(*jit)->GetName()] = (*jit)->GetAngle(0).Radian();
@@ -168,20 +164,21 @@ namespace gazebo
             {
                // q : Next Joint
                case 113:
-                    if(jointsIterator == --joints.end()){
-                        this->jointsIterator = joints.begin();}
+                    
 
                     this->jointsIterator++;
+					if(jointsIterator == --joints.end()){
+                        this->jointsIterator = joints.begin();}
                     std::cerr << "Selected Joint: "<< (*jointsIterator) << "\n";
                     break;
 
                // a : Previous Joint
                case 97:
-                    if(jointsIterator == ++joints.begin()){
-                        this->jointsIterator = joints.end();
-                    }
 
                     this->jointsIterator--;
+					if(jointsIterator == ++joints.begin()){
+                        this->jointsIterator = joints.end();
+                    }
                     std::cerr << "Selected Joint: "<< (*jointsIterator) << "\n";
                     break;
 
@@ -297,7 +294,7 @@ namespace gazebo
     //List with all revolute joint names
     private: std::list<std::string> joints;
     // iterator for saving the currently selected joint
-    private: std::list<std::string>::iterator jointsIterator = joints.begin();
+    private: std::list<std::string>::iterator jointsIterator = joints.begin()++;
     //map with joints' angles by their names
     private: std::map<std::string, double> jointAngles;
 

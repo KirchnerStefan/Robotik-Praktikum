@@ -1203,8 +1203,8 @@
         <dynamics>
           <spring_reference>0</spring_reference>
           <spring_stiffness>0</spring_stiffness>
-          <damping>0</damping>
-          <friction>0</friction>
+          <damping>150</damping>
+          <friction>50</friction>
         </dynamics>
       </axis>
       <physics>
@@ -1253,8 +1253,8 @@
         <dynamics>
           <spring_reference>0</spring_reference>
           <spring_stiffness>0</spring_stiffness>
-          <damping>0</damping>
-          <friction>0</friction>
+          <damping>150</damping>
+          <friction>100</friction>
         </dynamics>
       </axis>
       <physics>
@@ -1336,8 +1336,8 @@
         <dynamics>
           <spring_reference>0</spring_reference>
           <spring_stiffness>0</spring_stiffness>
-          <damping>0</damping>
-          <friction>0</friction>
+          <damping>40</damping>
+          <friction>10</friction>
         </dynamics>
       </axis>
       <physics>
@@ -1386,8 +1386,8 @@
         <dynamics>
           <spring_reference>0</spring_reference>
           <spring_stiffness>0</spring_stiffness>
-          <damping>0</damping>
-          <friction>0</friction>
+          <damping>100</damping>
+          <friction>40</friction>
         </dynamics>
       </axis>
       <physics>
@@ -1419,8 +1419,8 @@
         <dynamics>
           <spring_reference>0</spring_reference>
           <spring_stiffness>0</spring_stiffness>
-          <damping>0</damping>
-          <friction>0</friction>
+          <damping>180</damping>
+          <friction>70</friction>
         </dynamics>
       </axis>
       <physics>
@@ -1472,6 +1472,6 @@
     </joint>
     <static>0</static>
     <allow_auto_disable>1</allow_auto_disable>
-    <!--<plugin name='myarm_plugin' filename='libmyarm_plugin.so'/>-->
+    <plugin name='myarm_plugin' filename='libmyarm_plugin.so'/>
   </model>
 </sdf>
