@@ -1,0 +1,97 @@
+<?xml version="1.0" ?>
+
+<robot name="myrobot" xmlns:xacro="https://www.ros.org/wiki/xacro">
+	<!-- BGN include files -->
+	<xacro:include filename="$(find myrobot_description)/urdf/links_joints.xacro"/>
+	<xacro:include filename="$(find myrobot_description)/urdf/robot_parameters.xacro"/>
+	<xacro:include filename="$(find myrobot_description)/urdf/gazebo.xacro" />
+	<!-- END include files -->
+
+	<!-- BGN robot_description -->
+	<createBoxLink name="${base}" 
+					size="${base_size}" 
+					origin_xyz="0 0 0" origin_rpy="0 0 0" 
+					mass="${base_mass}" w="${base_width}" d="${base_depth}" h="${base_height}"/> 
+	
+	<createRevoluteJoint name="${base}__${gG1}"
+							axis_xyz="0 0 1" effort_limit="${gG_effort}"
+							origin_xyz="0 0 ${base_height/2}" origin_rpy="0 0 0" 
+							parent="${base}" child="${gG1}" />
+
+	<createCylinderLink name="${gG1}"
+						radius="${gG_radius}" length="${gG_length}" mass="${gG_mass}"
+						origin_xyz="0 0 ${gG_radius}" origin_rpy="0 1.57075 0" />
+
+	<createRevoluteJoint name="${gG1}__${gG2}"
+							axis_xyz="1 0 0" effort_limit="${gG_effort}"
+							origin_xyz="${gG_length/2} 0 ${gG_radius}" origin_rpy="0 0 0" 
+							parent="${gG1}" child="${gG2}" />
+
+	<createCylinderLink name="${gG2}"
+						radius="${gG_radius}" length="${gG_length}" mass="${gG_mass}"
+						origin_xyz="${gG_length/2} 0 0" origin_rpy="0 1.57075 0" />
+	
+	<createFixedJoint name="${gG2}__${uS}"
+						origin_xyz="${gG_length/2} 0 ${gG_radius}" origin_rpy="0 0 0"
+						parent="${gG2}" child="${uS}" />
+
+	<createCylinderLink name="${uS}"
+						radius="${uS_radius}" length="${uS_length}" mass="${uS_mass}"
+						origin_xyz="0 0 ${uS_length/2}" origin_rpy="0 0 0" />
+
+	<createFixedJoint name="${uS}__${mG1}"
+						origin_xyz="0 0 ${uS_length}" origin_rpy="0 0 0"
+						parent="${uS}" child="${mG1}" />
+
+	<createCylinderLink name="${mG1}"
+						radius="${mG_radius}" length="${mG_length}" mass="${mG_mass}"
+						origin_xyz="0 0 ${mG_radius}" origin_rpy="0 1.57075 0" />
+
+	<createRevoluteJoint name="${mG1}__${mG2}"
+							axis_xyz="1 0 0" effort_limit="${mG_effort}"
+							origin_xyz="${-mG_length/2} 0 ${mG_radius}" origin_rpy="0 0 0" 
+							parent="${mG1}" child="${mG2}" />
+
+	<createCylinderLink name="${mG2}"
+						radius="${mG_radius}" length="${mG_length}" mass="${mG_mass}"
+						origin_xyz="${-mG_length/2} 0 0" origin_rpy="0 1.57075 0" />
+	
+	<createRevoluteJoint name="${mG2}__${oS}"
+							axis_xyz="0 0 1" effort_limit="${mG_effort}"
+							origin_xyz="${-mG_length/2} 0 ${mG_radius}" origin_rpy="0 0 0" 
+							parent="${mG2}" child="${oS}"/>
+
+	<createCylinderLink name="${oS}"
+						radius="${oS_radius}" length="${oS_length}" mass="${oS_mass}"
+						origin_xyz="0 0 ${oS_length/2}" origin_rpy="0 0 0" />
+
+	<createFixedJoint name="${oS}__${kG1}"
+						origin_xyz="0 0 ${oS_length}" origin_rpy="0 0 0"
+						parent="${oS}" child="${kG1}" />
+
+	<createCylinderLink name="${kG1}"
+						radius="${kG_radius}" length="${kG_length}" mass="${kG_mass}"
+						origin_xyz="0 0 ${kG_radius}" origin_rpy="0 1.57075 0" />
+
+	<createRevoluteJoint name="${kG1}__${kG2}"
+							axis_xyz="1 0 0" effort_limit="${kG_effort}"
+							origin_xyz="${kG_length/2} 0 ${kG_radius}" origin_rpy="0 0 0" 
+							parent="${kG1}" child="${kG2}" />
+
+	<createCylinderLink name="${kG2}"
+						radius="${kG_radius}" length="${kG_length}" mass="${kG_mass}"
+						origin_xyz="${kG_radius} 0 ${-kG_length/4}" origin_rpy="0 0 0" />
+
+	<createRevoluteJoint name="${kG2}__${eE}"
+							axis_xyz="0 0 1" effort_limit="${kG_effort}"
+							origin_xyz="${kG_radius} 0 ${-kG_length*3/4}" origin_rpy="0 0 0" 
+							parent="${kG2}" child="${eE}" />
+
+	<createBoxLink name="${eE}" 
+					size="${eE_size}" 
+					origin_xyz="0 0 ${-eE_height/2}" origin_rpy="0 0 0" 
+					mass="${eE_mass}" w="${eE_width}" d="${eE_depth}" h="${eE_height}"/> 
+	
+	<!-- END robot_description -->
+
+</robot>

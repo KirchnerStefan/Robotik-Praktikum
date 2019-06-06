@@ -1,0 +1,13 @@
+controller_list:
+ - name: myrobot/arm_controller
+   action_ns: follow_joint_trajectory
+   type: FollowJointTrajectory
+   default: true
+   joints:
+     - base_Link__gG_Rechts
+     - gG_Rechts__gG_Links
+     - mG_Links__mG_Rechts
+     - mG_Rechts__oberSchwinge
+     - kG_Rechts__kG_Links
+     - kG_Links__endEffektor
+

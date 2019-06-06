@@ -1,0 +1,8 @@
+<?xml version="1.0" ?>
+<launch>
+		<!-- define robotmodel -->
+		<param name="robot_description" command="$(find xacro)/xacro '$(find myrobot_description)/urdf/myrobot.urdf.xacro'" />
+		<!-- spawn robot model -->
+		<node name="myrobot_spawn" pkg="gazebo_ros" type="spawn_model" args="-param robot_description -urdf -model myrobot -x 0 -y 0 -z 0.0275" />
+
+</launch>

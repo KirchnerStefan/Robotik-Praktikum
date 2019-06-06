@@ -1,0 +1,47 @@
+myrobot:
+  # Publish all joint states -----------------------------------
+  joint_state_controller:
+    type: joint_state_controller/JointStateController
+    publish_rate: 50
+myrobot/arm_controller:
+  type: "effort_controllers/JointTrajectoryController"
+  joints:
+    - base_Link__gG_Rechts
+    - gG_Rechts__gG_Links
+    - mG_Links__mG_Rechts
+    - mG_Rechts__oberSchwinge
+    - kG_Rechts__kG_Links
+    - kG_Links__endEffektor
+  constraints:
+    goal_time: 20.0                   # Override default
+    stopped_velocity_tolerance: 0.01 # Override default
+    base_Link__gG_Rechts:
+      trajectory: 0.1               # Not enforced if unspecified
+      goal: 0.1                     # Not enforced if unspecified
+    gG_Rechts__gG_Links:
+      trajectory: 0.1               # Not enforced if unspecified
+      goal: 0.1                     # Not enforced if unspecified
+    mG_Links__mG_Rechts:
+      trajectory: 0.1               # Not enforced if unspecified
+      goal: 0.1                     # Not enforced if unspecified
+    mG_Rechts__oberSchwinge:
+      trajectory: 0.1               # Not enforced if unspecified
+      goal: 0.1                     # Not enforced if unspecified
+    kG_Rechts__kG_Links:
+      trajectory: 0.1               # Not enforced if unspecified
+      goal: 0.1                     # Not enforced if unspecified
+    kG_Links__endEffektor:
+      trajectory: 0.1               # Not enforced if unspecified
+      goal: 0.1                     # Not enforced if unspecified
+
+  gains: # Required because we're controlling an effort interface
+    base_Link__gG_Rechts: {p: 1000,  d: 0, i: 0, i_clamp: 1}
+    gG_Rechts__gG_Links: {p: 1000,  d: 0, i: 0, i_clamp: 1}
+    mG_Links__mG_Rechts: {p: 1000,  d: 0, i: 0, i_clamp: 1}
+    mG_Rechts__oberSchwinge: {p: 1000,  d: 0, i: 0, i_clamp: 1}
+    kG_Rechts__kG_Links: {p: 1000,  d: 0, i: 0, i_clamp: 1}
+    kG_Links__endEffektor: {p: 1000,  d: 0, i: 0, i_clamp: 1}
+
+  state_publish_rate:  25            # Override default
+  action_monitor_rate: 30            # Override default
+  stop_trajectory_duration: 0        # Override default

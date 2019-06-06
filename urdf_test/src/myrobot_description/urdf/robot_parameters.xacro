@@ -1,0 +1,56 @@
+<?xml version="1.0" ?>
+
+<robot name="myrobot" xmlns:xacro="https://www.ros.org/wiki/xacro">
+	
+	<!-- properties of the robot -->	
+
+	<xacro:property name="base" value="base_Link" />
+	<xacro:property name="base_size" value="0.2 0.1 0.055" />
+	<xacro:property name="base_width" value="0.2" />
+	<xacro:property name="base_depth" value="0.1" />
+	<xacro:property name="base_height" value="0.055" />
+	<xacro:property name="base_mass" value="1000" />
+
+	<!-- properties of the big motors/links -->
+	<xacro:property name="gG1" value="gG_Rechts" />
+	<xacro:property name="gG2" value="gG_Links" />
+	<xacro:property name="gG_length" value="0.215" />
+	<xacro:property name="gG_radius" value="0.0975" />
+	<xacro:property name="gG_effort" value="300" />
+	<xacro:property name="gG_mass" value="13" />
+
+	<!-- properties of the middle motors/links -->
+	<xacro:property name="mG1" value="mG_Links" />
+	<xacro:property name="mG2" value="mG_Rechts" />
+	<xacro:property name="mG_length" value="0.152" />
+	<xacro:property name="mG_radius" value="0.065" />
+	<xacro:property name="mG_effort" value="200" />
+	<xacro:property name="mG_mass" value="5.269" />
+
+	<!-- properties of the small motors/links -->
+	<xacro:property name="kG1" value="kG_Rechts" />
+	<xacro:property name="kG2" value="kG_Links" />
+	<xacro:property name="kG_length" value="0.158" />
+	<xacro:property name="kG_radius" value="0.045" />
+	<xacro:property name="kG_effort" value="100" />
+	<xacro:property name="kG_mass" value="2.754" />
+
+	<!-- properties of lower & upper arm and endeffector -->
+	<xacro:property name="uS" value="unterSchwinge" />
+	<xacro:property name="uS_length" value="0.542" />
+	<xacro:property name="uS_radius" value="0.06" />
+	<xacro:property name="uS_mass" value="3.395" />
+
+	<xacro:property name="oS" value="oberSchwinge" />
+	<xacro:property name="oS_length" value="0.4875" />
+	<xacro:property name="oS_radius" value="0.045" />
+	<xacro:property name="oS_mass" value="1.62" />
+
+	<xacro:property name="eE" value="endEffektor" />
+	<xacro:property name="eE_size" value="0.1 0.1 0.11" />
+	<xacro:property name="eE_width" value="0.1" />
+	<xacro:property name="eE_depth" value="0.1" />
+	<xacro:property name="eE_height" value="0.11" />
+	<xacro:property name="eE_mass" value="0.2" />
+
+</robot>

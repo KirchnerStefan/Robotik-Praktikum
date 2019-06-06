@@ -1,0 +1,36 @@
+myrobot:
+  # Publish all joint states -----------------------------------
+  joint_state_controller:
+    type: joint_state_controller/JointStateController
+    publish_rate: 50  
+  
+  # Position Controllers ---------------------------------------
+  base_Link__gG_Rechts_position_controller:
+    type: effort_controllers/JointPositionController
+    joint: base_Link__gG_Rechts
+    pid: {p: 100.0, i: 0.01, d: 10.0}
+
+  gG_Rechts__gG_Links_position_controller:
+    type: effort_controllers/JointPositionController
+    joint: gG_Rechts__gG_Links
+    pid: {p: 300.0, i: 0.01, d: 10.0}
+
+  mG_Links__mG_Rechts_position_controller:
+    type: effort_controllers/JointPositionController
+    joint: mG_Links__mG_Rechts
+    pid: {p: 100.0, i: 0.01, d: 10.0}
+
+  mG_Rechts__oberSchwinge_position_controller:
+    type: effort_controllers/JointPositionController
+    joint: mG_Rechts__oberSchwinge
+    pid: {p: 100.0, i: 0.01, d: 10.0}
+
+  kG_Rechts__kG_Links_position_controller:
+    type: effort_controllers/JointPositionController
+    joint: kG_Rechts__kG_Links
+    pid: {p: 100.0, i: 0.01, d: 10.0}
+
+  kG_Links__endEffektor_position_controller:
+    type: effort_controllers/JointPositionController
+    joint: kG_Links__endEffektor
+    pid: {p: 100.0, i: 0.01, d: 10.0}
