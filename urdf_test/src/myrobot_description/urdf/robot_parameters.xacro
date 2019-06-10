@@ -24,7 +24,7 @@
 	<xacro:property name="mG2" value="mG_Rechts" />
 	<xacro:property name="mG_length" value="0.152" />
 	<xacro:property name="mG_radius" value="0.065" />
-	<xacro:property name="mG_effort" value="200" />
+	<xacro:property name="mG_effort" value="300" />
 	<xacro:property name="mG_mass" value="5.269" />
 
 	<!-- properties of the small motors/links -->

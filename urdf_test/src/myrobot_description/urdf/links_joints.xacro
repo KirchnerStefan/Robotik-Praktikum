@@ -59,7 +59,7 @@
 	<xacro:macro name="createRevoluteJoint" params="name axis_xyz effort_limit origin_xyz origin_rpy parent child">
 		<joint name="${name}" type="revolute">
 			<axis xyz="${axis_xyz}" />
-			<limit effort="${effort_limit}" lower="-3.14" upper="3.14" velocity="0.1"/>
+			<limit effort="${effort_limit}" lower="-3.14" upper="3.14" velocity="2"/>
 			<origin xyz="${origin_xyz}" rpy="${origin_rpy}" />
 			<parent link="${parent}"/>
 			<child link="${child}"/>

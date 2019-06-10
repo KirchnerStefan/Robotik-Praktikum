@@ -167,7 +167,7 @@ namespace gazebo
                     
 
                     this->jointsIterator++;
-					if(jointsIterator == --joints.end()){
+					if(jointsIterator == joints.end()){
                         this->jointsIterator = joints.begin();}
                     std::cerr << "Selected Joint: "<< (*jointsIterator) << "\n";
                     break;
@@ -175,10 +175,11 @@ namespace gazebo
                // a : Previous Joint
                case 97:
 
-                    this->jointsIterator--;
-					if(jointsIterator == ++joints.begin()){
+                    
+					if(jointsIterator == joints.begin()){
                         this->jointsIterator = joints.end();
                     }
+					this->jointsIterator--;
                     std::cerr << "Selected Joint: "<< (*jointsIterator) << "\n";
                     break;
 

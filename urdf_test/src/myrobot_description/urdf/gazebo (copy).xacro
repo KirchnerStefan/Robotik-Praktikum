@@ -11,6 +11,15 @@
         <static>true</static>
     </gazebo>
 
+    <gazebo reference="base_Link__gG_Rechts">
+	<mu1>150</mu1>
+    	<mu2>50</mu2>
+    </gazebo>
+
+    <gazebo reference="gG_Rechts__gG_Links">
+	<mu1>150</mu1>
+    	<mu2>50</mu2>
+    </gazebo>
 
     <gazebo reference="gG_Links__unterSchwinge">
 	<disableFixedJointLumping>true</disableFixedJointLumping>
@@ -20,11 +29,30 @@
 	<disableFixedJointLumping>true</disableFixedJointLumping>
     </gazebo>
 
+    <gazebo reference="mG_Links__mG_Rechts">
+	<mu1>180</mu1>
+    	<mu2>70</mu2>
+    </gazebo>
 
+    <gazebo reference="mG_Rechts__oberSchwinge">
+	<mu1>100</mu1>
+    	<mu2>40</mu2>
+    </gazebo>
 
     <gazebo reference="oberSchwinge__kG_Rechts">
 	<disableFixedJointLumping>true</disableFixedJointLumping>
     </gazebo>
 
+    <gazebo reference="kG_Rechts__kG_Links">
+	<mu1>40</mu1>
+    	<mu2>10</mu2>
+    </gazebo>
+
+    <gazebo reference="kG_Links__endEffektor">
+	<mu1>1000</mu1>
+    	<mu2>1000</mu2>
+	<kp>1000</kp>
+    	<kd>1000</kd>
+    </gazebo>
 
 </robot>
